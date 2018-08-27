@@ -1,0 +1,89 @@
+Systems other than K
+
+-- More rules --
+
+Until now we have only implemented the modal logic system K.
+For epistemic logic other systems are used, for example system S5 where the relations in the models are equivalence relations.
+These extended systems can be built from system K by adding more rules.
+
+--- Rule D, seriality ---
+
+If a model is serial all worlds have at least one outgoing relation (for each agent),
+so it can not be the case that $M,s \models \BB_i \bot$.
+An equivalent statement is that if $M,s \models \BB_i \phi$ then also $M,s \models \DD_i \phi$;
+if $\phi$ holds everywhere then it must hold somewhere.
+
+We can add this last formulation as a rule.
+FORMULA: rule-D
+  \prule[D\Pos]
+  { \T \G, \BB_i \phi\Pos }
+  { \T \G, \DD_i \phi\Pos }
+  &&
+  \prule[D\Neg]
+  { \T \G, \DD_i \phi\Neg }
+  { \T \G, \BB_i \phi\Neg }
+
+The $D\Neg$ rule is just the contrapositive of the $D\Pos$ rule.
+Also remember that we make copies of the conclusion with the $+C$ meta-rule,
+so both the $D\Neg$ and the $\BB\Neg$ rule can be applied to the same formula.
+
+--- Rule T, reflexivity ---
+
+In a reflexive model if $\BB_i \phi$ holds in some world then $\phi$ also holds in that world itself, since there is a relation to it.
+Conversely, if we know that $\phi$ holds in some world, then in that world $\DD_i \phi$ also holds.
+
+As a rule
+FORMULA: rule-T
+  \prule[T\Pos]
+  { \T \G, \phi\Pos }
+  { \T \G, \DD_i \phi\Pos }
+  &&
+  \prule[T\Neg]
+  { \T \G, \phi\Neg }
+  { \T \G, \BB_i \phi\Neg }
+
+All reflexive models are also serial, so we could still use rule D for this class of models.
+But that is just a waste of resources, since rule T alone suffices.
+
+--- Rule 4, transitivity ---
+
+Models where all relations are transitive are more interesting.
+Transitivity can be formulated as:
+If in all reachable worlds $\phi$ holds, and a world $\world{\D}_i$ is reachable, then $\phi$ also holds in that world.
+
+FORMULA: rule-4
+  \prule[4\Pos]
+  { \T \G, \world{\D}_i, \BB_i \phi\Pos }
+  { \T \G, \world{\D, \BB_i \phi\Pos}_i }
+  &&
+  \prule[4\Neg]
+  { \T \G, \world{\D}_i, \DD_i \phi\Neg }
+  { \T \G, \world{\D,\DD_i \phi\Neg}_i }
+
+--- Rule 5, euclidean ---
+
+Finaly models with euclidean relations are very similar,
+
+FORMULA: rule-5
+  \prule[5\Pos]
+  { \T \G, \world{\D}_i, \DD_i \phi\Pos }
+  { \T \G, \world{\D,\DD_i \phi\Pos}_i }
+  &&
+  \prule[5\Neg]
+  { \T \G, \world{\D}_i, \BB_i \phi\Neg }
+  { \T \G, \world{\D, \BB_i \phi\Neg}_i }
+
+-- Mixing --
+
+Instead of adding these extra rules for all agents we could restrict each rule to a subset of them.
+That way we obtain a kind of mixed system.
+
+A mixed system can be very useful for modeling many problems.
+Take the muddy children problem.
+The knowledge of the children can be modeled using system S5, as is common in epistemic logic.
+Then an extra modal operator can be introduced for the announcement &ldquo;At least one of you is muddy&rdquo;.
+This operator will not follow the rules of S5, the situation after two announcements differs from that after just one, so the relation is clearly not transitive.
+In fact system K looks to be best suited for this ''time step'' operator.
+
+
+[[CONT: soundness.html|Soundness]]

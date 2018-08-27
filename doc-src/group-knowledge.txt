@@ -1,0 +1,79 @@
+Group knowledge
+
+-- Sets of agents --
+
+As a precursor to common knowledge consider knowledge in groups of agents.
+For example we could write
+FORMULA: group-knowledge-example
+  \BB_{\{1,2,3\}} \phi  \Eq  \BB_1 \phi \et \BB_2 \phi \et \BB_3 \phi
+
+This notation can be a useful short hand for formulas with many agents.
+It will also allow us to write $\BB_{All}$ or simply $\BB$ for knowledge that ''all'' agents have.
+This modal operator is commonly called E in epistemic logic.
+The previous case of $\BB_i$ can be considered a subset of group knowledge among a singleton set of agents, $\BB_{{i}}$.
+
+Just to be clear, the semantics of group knowledge are simply
+FORMULA: semantics-group-1
+  \BB_I \phi \EQ \forall i\in I\; \BB_i \phi
+Or equivalently
+FORMULA: semantics-group-2
+  \begin{array}{lcl}
+  M,s \models \BB_I \phi      &\EQ& \forall t\; sR_It \Imp M,t \models \phi
+  \\ && \text{where } R_I = \bigcup_{i\in I} R_i
+  \end{array}
+
+-- Adjusting our rules --
+
+For our proof system we can extend nested sequents in the same way as boxes.
+So we write $[\D]_I$. This means that the box rule can stay the same:
+FORMULA: rule-box-pos-group
+  \prule[\BB\Pos-group]
+  { \T \G, \world{\phi\Pos}_I }
+  { \T \G, \BB_I \phi\Pos }
+
+On the other hand the $\BB\Neg$ rule becomes considerably more complicated:
+FORMULA: rule-box-match-group
+  \prule[\BB\Neg-group]
+  { \T \G, \world{\D}_{A}, \BB_{B\cup C} \phi\Neg  &  \T \G, \world{\D,\phi\Neg}_B, \BB_{B\cup C} \phi\Neg  }
+  { \T \G, \world{\D}_{A\cup B}, \BB_{B\cup C} \phi\Neg }
+
+The reason for the two sequents above the line is that $[\D]_I$ is a ''con''junction of $[\D]_i$ for each $i\inI$,
+and we have no direct way of representing conjunctions in our sequents.
+Only for the matching subset of agents can $\phi\Neg$ be added to the world's sequent, for the remaining agents nothing changes.
+
+To understand this rule, remember that $\BB_{A \cup B}\phi = \BB_A\phi \et \BB_B\phi$ and also for nested sequents, $[\D]_{A \cup B} = [\D]_A \et [\D]_B$.
+So we can write down the following pseudo-derivation for the $\BB\Neg-\n{group}$ rule:
+
+FORMULA: intuition-box-match-group
+  \infer[\cup\text{ for }{[\D]}]
+  { \T \G, \world{\D}_{A\cup B}, \BB_{B\cup C} \phi\Neg }
+  { \infer[\n{\et\Pos}]
+    { \T \G, \world{\D}_{A} \et \world{\D}_{B}, \BB_{B\cup C} \phi\Neg }
+    { { \T \G, \world{\D}_A, \BB_{B\cup C} \phi\Neg }
+    & \infer[\cup\text{ for }\BB]
+      { \T \G, \world{\D}_B, \BB_{B\cup C} \phi\Neg }
+      { \infer[\n{\et\Neg}]
+        { \T \G, \world{\D}_B, \BB_B \phi \et \BB_C \phi\Neg }
+        { \infer[\n{\BB\Neg}]
+          { \T \G, \world{\D}_B, \BB_B \phi\Neg, \BB_C \phi\Neg }
+          { \infer[\cup\text{ for }\BB]
+            { \T \G, \world{\D,\phi\Neg}_B, \BB_B \phi\Neg, \BB_C \phi\Neg }
+            { \T \G, \world{\D,\phi\Neg}_B, \BB_{B\cup C} \phi\Neg }
+          }
+        }
+      }
+    }
+  }
+In the case that $A$ or $B$ is $\emptyset$ the left or right branch will contain $\world{\G}_\emptyset = True$,
+so that branch can then be ignored.
+
+
+
+-- Rules for restricted models --
+
+The rules for restricted classes of models such as rule 4 and 5 become considerably more complicated.
+Rule D and T on the other hand do not change at all, since in these rules the set of agents is not important.
+
+For rules 4 and 5 it may not be possible to do something interesting beyond fully expanding the sequent to a conjunction of worlds for each single agent.
+
+[[CONT: common-knowledge.html|Common knowledge]

@@ -1,0 +1,32 @@
+
+
+ <form onsubmit="runInput();return false;" action="#">
+   <div style="position:relative;" id="ui">
+     <a href="#" onclick="moreInput();return false;" id="more-input-btn" title="Expand input box">&darr;</a>
+     <div id="less-input"><input type="text" class="term" id="input"></div>
+     <div id="more-input" style="display:none">
+       <textarea class="term" id="input2" rows="15" cols="80"></textarea>
+       <input type="submit" value="submit">
+     </div>
+   </div>
+ </form>
+ 
+ <div id="answer" class="none">
+  Enter a term in the box above to proof/disprove it. For more information see
+  <ul>
+   <li><a href="users-guide.html">Users guide</a>
+   <li><a href="syntax.html">Syntax reference</a>
+  </ul>
+ </div>
+ 
+ <script type="text/javascript">
+   $(document).ready(function() {
+     var term  = /\?term=(.*)/.exec(window.location.search);
+     var examp = /\?example=(.*)/.exec(window.location.search);
+     if (term) {
+        example(unescape(term[1]));
+     } else if (examp) {
+        example(eval(examp[1]));
+     }
+   });
+ </script>

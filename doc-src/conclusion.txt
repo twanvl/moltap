@@ -1,0 +1,48 @@
+Conclusions
+
+-- Conclusion --
+
+MOLTAP is an automated prover of modal logic that is not just of theoretical interest.
+There are three aspects that make it useful as a practical tool.
+
+First of all the logic behind the prover has been shown to be sound and complete.
+This means that the results will be as expected.
+A tool that could spout nonsense is useless.
+
+The second quality that makes MOLTAP useful is the fact that it has got a decent user interface.
+This is the point where other systems fail.
+MOLTAP includes both a web interface for easily entering formulas and getting direct results,
+as well as a command line program for conveniently working with larger formulas.
+
+Finally the ability to extract counter models can be very useful.
+It can be used as an educational tool to teach students about Kripke models and validity of formulas.
+Counter models can also be used for quickly finding a model with a given property.
+For example to find a model in which $x \et M_1\negK_2 x$ holds simply enter the negation into the prover, [[EX: ~(x & M_1 ~K_2 x)]].
+
+-- Future work --
+
+There are still several tasks remaining.
+The most important of these is the correct formulation of rules for group and common knowledge.
+
+The rules for group knowledge in system K are still understandable,
+but when different systems are used the situation becomes exceedingly difficult.
+
+Similarly ''assuming'' common knowledge is not too hard, a formula like $\BB* \phi \imp \psi$
+can simply be interpreted as $(\phi \et \BB \phi \et \BB\BB \phi \et ...) \imp \psi$.
+But this interpretation already leads to problems with non-termination in rare corner cases such as $\neg\BB*\DD\phi$.
+The program can keep adding boxes because the diamond rule creates new worlds to match.
+It turns out that in system S5 this does not happen, and MOLTAP does implement such a rule for common knowledge.
+
+Proving common knowledge on the other hand is very difficult.
+Usually induction rules are required, which again have a large risk of non-termination.
+%Logical systems like KEC (system K with common knowledge) are probably as close as
+
+Another avenue for further work is mixed systems.
+In such a system one set of relations can be for example full equivalence relations, while another set is only serial.
+It is likely that this opens up many interesting options for modeling real world problems.
+
+Finally it would be nice if a derivation could be shown for valid formulas.
+This would convince the user of the correctness, and allow the output to be used beyond the program.
+It is not hard to keep track of which rules are applied and upon reaching an axiom this list can be reversed to give a derivation.
+It might also be useful to show derivations in a more traditional proof system, which the user is more likely to be familiar with.
+

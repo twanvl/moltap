@@ -1,0 +1,70 @@
+Examples
+
+-- Three hats problem --
+
+There are three agents each wearing a red or blue hat, each agent can see the other hats but not his own.
+There is an announcement: "there are at most two blue hats"
+Does any agent now know the color of his own hat?
+
+<a href="prover.html?example=threeHats1" class="term">The three hats problem</a>
+
+In general the answer is of course no. But what if there are indeed two blue hats, for example for agents 1 and 2?
+
+<a href="prover.html?example=threeHats2" class="term">The three hats problem (2)</a>
+
+If after the announcement none of the agents step forward we know that there were not two blue hats, so at most one hat is blue.
+This has become common knowledge
+
+<a href="prover.html?example=threeHats3" class="term">The three hats problem (3)</a>
+
+As the model shows if all agents have a red hat they will still not know the color of their hats.
+So, if after the second announcement no agent steps forward all agents wear a red hat.
+Since this has become common knowledge, of course the agents will know the colors of their hats.
+
+<a href="prover.html?example=threeHats4" class="term">The three hats problem (4)</a>
+
+
+-- Test cases --
+
+Here are some examples of both true and false formulas.
+These are used as test cases for the program.
+Click on a formula to input it into the prover.
+
+%These formulas are all true in S5 
+%* [[EX: K_1 a -> a]]
+%* [[EX: a | ~a]]
+
+%But this is false in system K
+%* [[EX: system K; K_1 -> a]]
+
+%These formulas are false
+%* [[EX: a -> K_1 a]]
+
+%The following formulas are all true. They are listed as test cases in %TODO
+* [[EX: K_1 M_1 M_3 K_3 K_2 K_1 a -> a]]
+* [[EX: ~(K_1(a | ~b) & M_1 ~a & M_1(~a & b))]]
+* [[EX: ~M_1(~a & a)]]
+* [[EX: K_1 M_1 M_3 K_3 K_2 K_3 a -> M_1 M_3 a]]
+* [[EX: ~(K_1(a | b) & M_1 ~a & M_1 K_1 M_3 ~b & (M_1 K_2 M_1(~a & ~b) | M_1(~a & ~b) | K_1 a))]]
+* [[EX: ~(K_1 M_1 M_3 K_3 K_2 K_3 a & K_1 M_3 M_2 K_3 M_2 ~a)]]
+* [[EX: ~(K_1 M_1 M_3 K_3 K_2 K_3 a & K_1 M_3 K_3 K_2 (~a | x) & K_1 ~x)]]
+* [[EX: K_1 (a -> b) -> ( K_1 a -> K_1 b)]]
+* [[EX: K_1 a -> a]]
+* [[EX: K_1 a -> K_1 K_1 a]]
+* [[EX: M_1 a -> K_1 M_1 a]]
+* [[EX: M_1 (K_1 p | M_2 K_2 K_1 q) -> K_1 (~q -> p)]]
+* [[EX: ((p & ~K_1 p) -> ~p) | ((p & ~K_1 p) -> ~((p & ~K_1 p) -> ~K_1((p & ~K_1 p) -> p )))]]
+* [[EX: (K_1 (a | b) & (c -> K_1 ~b) & (K_1 a -> d)) -> (c -> d)]]
+* [[EX: (K_1(g = K_1 p) & M_1 g) -> (g & p)]]
+* [[EX: (K_1(g = K_1 p) & M_1 ~g) -> ~g]]
+* [[EX: (K_1 p & K_1((a & p) -> b)) -> K_1 (a -> b)]]
+
+And here are some false formulas from the same source:
+* [[EX: (K_1 p & K_1 ((a & p) -> b)) -> (M_1 ~b & K_1 (a -> b))]]
+* [[EX: K_1 M_1 M_3 K_3 K_2 K_3 a -> b]]
+* [[EX: ~(K_1 (a | ~b) & M_1 ~a & M_1 b)]]
+* [[EX: K_1 M_1 M_3 K_3 K_2 M_3 a -> K_1 K_3 a]]
+* [[EX: ~(K_1 (a | b) & M_1 ~a & (M_1 (~a & ~b) | M_1 a))]]
+* [[EX: ~(K_1 M_1 M_3 K_3 K_2 K_3 a & K_1 M_3 K_3 K_2 (~a | x) & ~x)]]
+* [[EX: ((p & ~K_1 p) -> p) & ((p & ~K_1 p) -> ~((p & ~K_1 p) -> K_1((p & ~K_1 p) -> p )))]]
+* [[EX: ~(K_1 M_3 (M_1 a | K_4 b) & K_3 (K_1 K_3 ~a & M_3 K_4 K_3 M_6 ~b))]]

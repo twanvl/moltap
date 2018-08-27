@@ -1,0 +1,257 @@
+Propositional tableaux
+
+-- A simple proof system --
+
+Now that we have defined semantic validity with $\models$ it is time to look at ''syntactic'' validity.
+Syntactic validity, or derivability, is written $\T \G$.
+This validity predicate is built up from axioms and proof rules.
+
+--- Axioms ---
+Our three axioms can be written as
+FORMULA: axiom-true
+  \ptop[\ True]{ \T \G, \top\Pos }
+  &&
+  \ptop[\ False]{ \T \G, \bot\Neg }
+FORMULA: axiom-assum
+  \ptop[Assum]{ \T \G, \phi\Pos, \phi\Neg }
+
+The $\n{\True}$ axiom states that $\T \top\Pos$.
+In other words, that $\top\Pos$ is derivable.
+We will later show the <a href="soundness.html">soundness</a> and <a href="counter-models.html">completeness</a>,
+$\T \Gamma$ if and only if $\models \Gamma$.
+
+The assumption axiom states that any sequent containing both $\phi\Pos$ and $\phi\Neg$ is always true.
+Recall that a sequent is a disjunction, so we are just saying that $\phi \vee \neg\phi$.
+
+--- Rules ---
+
+A complete ''derivation of $\T \G$'' will be a tree with $\T \G$ at the root and axioms at the leafs.
+The internal nodes will be formed by ''rules''.
+
+The simplest of these rules are the ''negation rules'':
+FORMULA: rule-neg
+  \prule[\neg\Pos]
+  { \T \G, \phi\Neg }
+  { \T \G, \neg \phi\Pos }
+  &&
+  \prule[\neg\Neg]
+  { \T \G, \phi\Pos }
+  { \T \G, \neg \phi\Neg }
+
+If it is possible to derive $\phi\Neg$, then by applying this rule to the resulting sequent, $\neg\phi\Pos$ can be derived.
+Note that the sequents contain a part $\Gamma$ which the rule does not change, we call $\Gamma$ the ''context''.
+The formulas that are actively used by the rule are called ''principal'' formulas.
+$\Gamma$ can stand for any sequent and $\phi$ for any formula.
+
+%One of the simplest rules is the contraction rule:
+%
+%FORMULA: rule-contraction
+%  \prule[C]
+%  { \T \G, A, A }
+%  { \T \G, A }
+
+%Using contraction if we have for example a derivation of $\T p\Pos,p\Pos,q\Neg$ we can also construct a derivation of $\T p\Pos,q\Neg$.
+%Contraction is the only ''structural rule'', it manipulates the sequent but not the formulas.
+%All other rules will be ''logical rules'' that actually do something with the formulas in the sequent.
+
+%Looking at the rule again, we see that the sequents contain a part $\Gamma$ which the rule does not change, we call $\Gamma$ the ''context''.
+%The formulas that are actively used by the rule are called ''principal'' formulas.
+
+The disjunction rules use the fact that a sequent is interpreted as a disjunction.
+They just compose $\phi^+ \vee \psi^+$ into ${\phi^+,\psi^+}$.
+Note that negative occurrences of $\et$ also fall under the disjunction rule because of De Morgan's laws.
+
+FORMULA: rule-disjunction
+  \prule[\et\Neg]
+  { \T \G, \phi\Neg, \psi\Neg }
+  { \T \G, \phi \et \psi\Neg }
+  &&
+  \prule[\vee\Pos]
+  { \T \G, \phi\Pos, \psi\Pos }
+  { \T \G, \phi \vee \psi\Pos }
+  &&
+  \prule[\imp\Pos]
+  { \T \G, \phi\Neg, \psi\Pos }
+  { \T \G, \phi \imp \psi\Pos }
+
+To derive a conjunction (or negative disjunction), for example $\phi\et\psi\Pos$, two derivations are needed;
+one for $\phi\Pos$ and one for $\psi\Pos$. If both of these are derivable, then so is their conjunction.
+FORMULA: rule-conjunction
+  \prule[\et\Pos]
+  { \T \G, \phi\Pos  &  \T \G, \psi\Pos }
+  { \T \G, \phi \et \psi\Pos }
+  &&
+  \prule[\vee\Neg]
+  { \T \G, \phi\Neg  &  \T \G, \psi\Neg }
+  { \T \G, \phi \vee \psi\Neg }
+  &&
+  \prule[\imp\Neg]
+  { \T \G, \phi\Pos  &  \T \G, \psi\Neg }
+  { \T \G, \phi \imp \psi\Neg }
+
+Each of these ''logical rules'' adds a connective when read from top to bottom.
+And we now have rules for all logical connectives in our language.
+%All logical rules will increase the number of connectives (when read from top to bottom).
+
+--- Example ---
+
+Consider the formula $(p \vee \neg(p \et q)) \et \top$.
+A possible derivation of that formula is:
+
+FORMULA: example-derivation1
+  \infer[\n{\et\Pos}]
+  { \T (p \vee \neg(p \et q)) \et \top\Pos }
+  { \infer[\n{\vee\Pos}]
+    { \T p \vee \neg(p \et q) \Pos }
+    { \infer[\n{\neg\Pos}]
+      { \T p \Pos, \neg(p \et q) \Pos }
+      { \infer[\n{\et\Neg}]
+        { \T p \Pos, p \et q \Neg }
+        { \inferT[\n{Assum}: p]
+          { \T p \Pos, p \Neg, q \Neg }
+        }
+      }
+    }
+  & \inferT[\n{True}]{ \T \top\Pos }
+  }
+
+Note that there are not many choices in our proof system; in fact there are no other ways to write a derivation of this formula.
+
+-- The proof search algorithm --
+
+But what do all these logic proofs have to do with semantic tableaux?
+
+We can use the rules we have defined in a ''proof search''.
+In such a search we know what formula we are after, it will be at the root of the derivation tree.
+Then we apply proof rules ''bottom-up'' until we reach an axiom.
+So if we go back to the example above, we would start by writing:
+
+FORMULA: example-derivation1-step1
+  \infer
+  { \T (p \vee \neg(p \et q)) \et \top\Pos }
+  { ??? }
+
+This sequent can only be the result of the conjunction rule.
+This rule will ''take apart'' the $\et$ connective.
+
+FORMULA: example-derivation1-step2
+  \infer[\n{\et\Pos}]
+  { \T (p \vee \neg(p \et q)) \et \top\Pos }
+  { \infer{\T p \vee \neg(p \et q) \Pos}{ ??? }
+  & \T \top\Pos
+  }
+
+On the right we already have an axiom.
+On the left the outermost connective is a disjunction; and we have a rule for taking it apart.
+We can continue this until all branches reach an axiom, in which case the derivation is finished,
+or until no further rules can be applied, in which case the derivation fails, and we know the formula is not syntactically valid.
+
+ALGORITHM: proof search 1
+  '''input:''' A goal sequent<br>
+  '''output:''' A derivation of that sequent if it exists
+  # If our current goal sequent matches an axiom, we are done.
+  # If our current goal $\T \Gamma,A$ matches the bottom of a logical rule then
+  .. <ol><li>Apply the logical rule, giving one or more sequents $\Gamma,A,B$.</li>
+  ..     <li>Use a proof search to find a proof of the new sequent(s).</li></ol>
+  # If no rules can be applied then the search has failed.
+
+-- Keeping duplicates --
+
+Now consider the goal formula $long \imp (long \vee x)$ where $long$ is a very long subformula.
+During the proof search, after applying a rule for the implication we have the sequent
+${long\Neg, long \vee x\Pos}$.
+If we now take apart the disjunction we immediately arrive at an axiom.
+However, if we first take apart the long formula the derivation will get larger, and there is no easy way to simplify it afterwards.
+Similarly, if we encounter $long \vee long \vee x\Pos$ both of the long subformulas will be taken apart.
+
+The solution to these problems is to keep a copy of the formula.
+So for example the new disjunction rule would become
+
+FORMULA: rule-disjunction-contract
+  \prule[\vee\Pos+C]
+  { \T \G, {\phi \vee \psi\Pos}, {\phi\Pos}, {\psi\Pos} }
+  { \T \G, {\phi \vee \psi\Pos} }
+
+For readability we will not write the rules in $\n{+C}$ form, because keeping track of all copies is tedious.
+Instead we conceptually use a ''meta-rule'' for transforming all rules:
+FORMULA: rule-meta-copy
+  \begin{array}{ccc}
+  \prule[R]{ \T \G,A }{ \T \G,B }
+    &\raisebox{3mm}{\IMP}&
+  \prule[R+C]{ \T \G,{B},{A} }{ \T \G,{A} } \\\\
+  \prule[R]{ \T \G,A_1  &  \T \G,A_2 }{ \T \G,B }
+    &\raisebox{3mm}{\IMP}&
+  \prule[R+C]{ \T \G,{B},{A_1} & \T \G,{B},{A_2} }{ \T \G,{A} }
+  \end{array}
+Where $A$ and $B$ are the principal formulas of the rule.
+From now on, all rules will be considered to keep copies.
+
+--- Termination ---
+
+If we try to do a proof search we hit a minor problem: the algorithm does not terminate.
+The same rule can be applied over and over again.
+Clearly each formula should be taken apart only once.
+
+ALGORITHM: proof search 2
+  '''input:''' A goal sequent<br>
+  '''output:''' A derivation of that sequent if it exists
+  # If our current goal sequent matches an axiom, we are done.
+  # If our current goal $\T \Gamma,A$ matches the bottom of a logical rule,
+  .. ''and the principal formulas have not participated in this rule before'', then
+  .. <ol><li>Apply the logical rule, giving one or more sequents $\Gamma,A,B$.</li>
+  ..     <li>Use a proof search to find a proof of the new sequent(s).</li></ol>
+  # If no rules can be applied then the search has failed.
+
+--- Marks ---
+
+To administer which formulas we have already inspected we mark them in the sequent.
+
+'''Definition:'''
+A ''marked formula'' is a signed formula that is marked as either ''used'' or as ''unused''.
+We will draw used formulas in grey and unused formulas in blue.
+
+So again the disjunction rule, this time with marks:
+FORMULA: rule-disjunction-color
+  %\prule[\et\Neg+C]
+  %{ \T \G, \Old{\phi \et \psi\Neg}, \New{\phi\Neg}, \New{\psi\Neg} }
+  %{ \T \G, \New{\phi \et \psi\Neg} }
+  %&&
+  \prule[\vee\Pos+C]
+  { \T \G, \Old{\phi \vee \psi\Pos}, \New{\phi\Pos}, \New{\psi\Pos} }
+  { \T \G, \New{\phi \vee \psi\Pos} }
+
+%The ''copy'' meta-rule
+%FORMULA: rule-meta-color
+%  \begin{array}{ccc}
+%  \prule[R]{ \T \G,A }{ \T \G,B }
+%    &\raisebox{3mm}{\IMP}&
+%  \prule[R+C]{ \T \G,\Old{B},\New{A} }{ \T \G,\New{A} } \\\\
+%  \prule[R]{ \T \G,A_1  &  \T \G,A_2 }{ \T \G,B }
+%    &\raisebox{3mm}{\IMP}&
+%  \prule[R+C]{ \T \G,\Old{B},\New{A_1} & \T \G,\Old{B},\New{A_2} }{ \T \G,\New{A} }
+%  \end{array}
+%Where $A$ and $B$ are the principal formulas of the rule.
+
+The distinction between used and unused formulas is only made for the purpose of presentation,
+it is just a way of administrating the information needed for the ''proof search 2'' algorithm.
+
+--- Does it work? ---
+
+Let us go back to the problematic examples.
+
+In the case of $long \imp (long \vee x)$ we can still take apart the long formula,
+after which we end up with a sequent like ${\Old{ContentsOfLong}, \Old{long\Neg}, \New{long \vee x\Pos}}$.
+The only remaining rule that can be applied is the disjunction rule to the rightmost term, giving
+${\Old{ContentsOfOld}, \Old{long\Neg}, \Old{long \vee x\Pos}, \New{long\Pos}, \New{x\Pos}}$.
+And this does match the assumption axiom.
+
+In the second problematic case we had multiple copies of a long formula.
+When used formulas are kept this no longer possible because the sequent is a set,
+it can contain only one copy of any signed formula.
+So for example when the disjunction rule is applied to the last formula of
+${ContenstOfLong, \Old{long\Pos}, \New{long \vee long\Pos}}$
+The resulting sequent becomes simply ${ContenstOfLong, \Old{long\Pos}}$.
+%%When taking the union of two sequents we let the used copy take precedence.
+
+
+[[CONT: tableaux-modal.html|Tableaux for modal logic]]

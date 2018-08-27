@@ -1,0 +1,95 @@
+Syntax reference
+
+-- Propositional formulas --
+
+There are three ways to write logical connectors
+# Using ASCII syntax, for example @p & q@.
+# Using Unicode symbols, for example @p \et q@.
+# Using natural language, for example @p and q@.
+
+IFLATEX: \begin{tabular}{|p{1.7cm}|p{1.5cm}|p{2.2cm}|p{8cm}|}
+!{3} Input syntax              !{1,2} Description
+! ASCII  ! Unicode  ! Text     !^^^
+..
+|{3} @p@, @q@, @cat@, @bigVar123 @
+..| Propositional variables consists of alphanumeric symbols, starting with a lower case letter.
+|{3} @(\phi)@
+..| Parentheses can be used for grouping.
+|  | @\top@, @\bot@  |  @true@, @false@
+..| The true/false proposition.
+| @~\phi@            | @\neg\phi@            | @not \phi@
+..| Logical negation, @\neg&phi;@ is true if and only if @\phi@ is false.
+| @\phi & \psi@      | @\phi \et \psi@   | @\phi and \psi@
+..| Logical conjunction
+| @\phi | \psi@      | @\phi \vee \psi@    | @\phi or \psi@
+..| Logical disjunction
+| @\phi -> \psi@     | @\phi \imp \psi@  | @\phi implies \psi@
+..| Logical implication
+| @\phi <- \psi@     | @\phi \pmi \psi@  |
+..| Implication written the other way around.
+| @\phi <-> \psi@, @\phi = \psi@  | @\phi \eq \psi@  |
+..| Logical equivalence
+| @\phi <-/-> \psi@, @\phi /= \psi@   | @\phi \not\eq \psi@, @\phi \neq \psi@  |
+..| Logical inequivalence
+
+-- Modal formulas --
+
+Modal formulas are formulas about agents. Agent names can be arbitrary strings of alphanumeric symbols.
+Examples of valid agent names are
+* <span class="term agent">1</span>, <span class="term agent">2</span>
+* <span class="term agent">Alice</span>, <span class="term agent">Bob</span>
+* <span class="term agent">my_Computer</span>
+* <span class="term">&alpha;</span>, <span class="term">&beta;</span>
+
+MOLTAP supports both the epistemic style (@K@/@M@) and modal style (@\BB@/@\DD@) of writing operators.
+%The two modal operators are box and diamond.
+%@K@/@\BB@ "knows"/"necessarily"/"box" and @M@/@\DD@ "holds as a possibility"/"optionally"/"diamond".
+%MOLTAP supports both the epistemic style (@K@/@M@) and modal style (@\BB@/@\DD@).
+
+IFLATEX: \begin{tabular}{|p{2.5cm}|p{2.5cm}|p{8.6cm}|}
+!{2,1} Input syntax            !{1,2} Description
+! Epistemic  ! Modal           !^^^
+..
+| @K__1 &phi;@, @K_1 &phi;@     | @[]_1 &phi;@, @\BB_1 &phi;@
+..| Agent 1 knows that $\phi$, $\phi$ is necessary for agent 1.
+| @K_{1,2} &phi;@               | @[]{1,2} &phi;@
+..| Agents 1 and 2 both knows that $\phi$. This is the same as @K_1 &phi; & K_2 &phi;@.
+| @K &phi;@                     | @[] &phi;@
+..| Every agent knows $\phi$.
+| @K* &phi;@, @K*_{1,2} &phi;@  | @[]* &phi;@
+..| It is common knowledge that $\phi$.<br> Every agent (in a set) knows that $\phi$, and they know that everyone knows, and they know that everyone knows that everyone knows, etc.
+| @M__1 &phi;@, @M_1 &phi;@     | @<>_1 &phi;@, @\DD_1 &phi;@
+..| Agent 1 holds $\phi$ for possible, $\phi$ is possible for agent 1.
+
+-- Advanced features --
+
+IFLATEX: \begin{tabular}{|p{3cm}|p{11cm}|}
+! Input syntax              ! Description
+..
+| @let x = \phi; \psi@
+..| Create a local declaration.
+..  Inside @&psi;@ all occurrences of @x@ will be replaced by @&phi;@.<br>
+..  Declarations are only allowed at the top level.
+| @system S; \psi@
+..| Change the axiom system. By default system S5 (=KT45) is used.
+..  The name S is either a combination of KDT45 or S4 or S5.
+| @# comment@
+..| Comments begin with a @#@ sign and run until the end of the line.
+
+The possible axioms stand for:
+* K = the basic axiom system, this is always used.
+* D = seriality, each world has a successor, $\DD_i\top$.
+* T = all relations are reflexive, $\BB_i\phi \imp \phi$.
+* 4 = all relations are transitive, $\BB_i\phi \imp \BB_i\BB_i\phi$.
+* 5 = all relations are euclidean, $\DD_i\phi \imp \BB_i\DD_i\phi$.
+
+-- Precedence and associativity --
+
+# @not@ and modal operators bind the strongest.
+# Followed by @and@,
+# then @or@
+# and finally implication and equivalence. Implication associates to the right.
+# Programming features like @let@ bind even weaker.
+
+So for example @K1 p \et ~q \vee r \imp s \imp t@ is parsed as
+@(((K__1 p) \et (&not;q)) \vee r) \imp (s \imp t)@.

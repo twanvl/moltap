@@ -1,0 +1,193 @@
+Soundness
+
+-- Soundness of propositional subset --
+
+We want our deduction rules to be sound, that is $\T \phi\Pos \Imp \models \phi\Pos$.
+This can be shown by induction over the length of the deduction.
+First we show that the axioms are valid and then that the rules preserve validity.
+
+In all cases let $M$ be an arbitrary model, and $s$ a world in that model.
+The validity of our axioms is trivial,
+FORMULA: soundness-axiom-true
+  M,s \models \G,\top\Pos
+  \;\Eq\;  (M,s \models G) \vee (M,s \models \top)
+  \;\Eq\;  \True
+FORMULA: soundness-axiom-assum
+  M,s \models \G,\phi\Pos,\phi\Neg
+  \;\Eq\;  (M,s \models G) \vee (M,s \models \phi) \vee (M,s \not\models \phi)
+  \;\Eq\;  \True
+
+For each rule we will show that it preserves validity; if the premises are valid then so is the conclusion.
+So if we have a rule
+FORMULA: soundness-rule
+  \prule{\G}{\D}
+We need to show that if $M,s \models \G$ then also $M,s \models \D$.
+
+For the negation rule this is simple,
+FORMULA: soundness-rule-neg
+          & M,s \models \G,\phi\Neg
+  \\\Eq\  & (M,s \models G) \vee (M,s \models \phi\Neg)
+  \\\Eq\  & (M,s \models G) \vee (M,s \not\models \phi)
+  \\\Eq\  & (M,s \models G) \vee (M,s \models \neg\phi)
+  \\\Eq\  & (M,s \models G) \vee (M,s \models \neg\phi\Pos)
+  \\\Eq\  & M,s \models \G, \neg\phi\Pos
+
+Slightly more interesting are the disjunction
+FORMULA: soundness-rule-disjunction
+          & M,s \models \G,\phi\Pos,\psi\Pos
+  \\\Eq\  & (M,s \models G) \vee (M,s \models \phi) \vee (M,s \models \psi)
+  \\\Eq\  & (M,s \models G) \vee (M,s \models \phi \vee \psi)
+  \\\Eq\  & M,s \models \G,\phi\vee\psi\Pos
+and conjunction rules,
+FORMULA: soundness-rule-conjunction
+          & (M,s \models \G,\phi\Pos) \et (M,s \models \G,\psi\Pos)
+  \\\Eq\  & \bigl( (M,s \models G) \vee (M,s \models \phi) \bigr) \et
+            \bigl( (M,s \models G) \vee (M,s \models \psi) \bigr)
+  \\\Eq\  & (M,s \models G) \vee \bigl( (M,s \models \phi) \et (M,s \models \psi) \bigr)
+  \\\Eq\  & (M,s \models G) \vee (M,s \models \phi \et \psi)
+  \\\Eq\  & M,s \models \G,\phi\et\psi\Pos
+
+Note that we only show the proof of one of each kind of rule, since the other rules are simply the De Morgan duals.
+
+Since we have made no assumptions about $M$ and $s$, the axioms and rules are valid in ''all'' possible models and worlds.
+This means that all propositional rules preserve semantic validity.
+If the premises are valid, then so is the conclusion.
+
+Now given a derivation of $\T \phi\Pos$, by induction over the structure of this derivation it holds that $\models \phi\Pos$.
+
+Recall that we added a copying mechanism to all rules.
+This does not affect validity and hence soundness, since $X \vee X$ is equivalent to $X$.
+See for example the disjunction rule:
+FORMULA: soundness-rule-disjunction-copy
+          & M,s \models \G,\phi\vee\psi\Pos,\phi\Pos,\psi\Pos
+  \\\Eq\  & (M,s \models G) \vee (M,s \models \phi \vee \psi) \vee (M,s \models \phi) \vee (M,s \models \psi)
+  \\\Eq\  & (M,s \models G) \vee (M,s \models \phi \vee \psi) \vee (M,s \models \phi \vee \psi)
+  \\\Eq\  & (M,s \models G) \vee (M,s \models \phi \vee \psi)
+  \\\Eq\  & M,s \models \G,\phi\vee\psi\Pos
+
+-- Soundness of modal formulas --
+
+The key to the modal proof system is deep rule application.
+This was formulated as three meta-rules.
+
+%If we assume that rule "R" is semantically valid,
+%i.e. $\forallM,t\;\; M,t \models \G \Imp M,t \models \D$.
+To show that a transformed rule &ldquo;deep R for i&rdquo; preserves validity first assume that rule "R" does.
+That is to say, if $M,t \models \G$ then $M,t \models \D$, for all worlds $t$ (and all models $M$).
+The the &ldquo;deep R for i&rdquo; rule will also preserve validity:
+FORMULA: soundness-deep-1
+          & M,s \models \E,[\G]_i
+  \\\Eq\  & (M,s \models \E) \vee (M,s \models [\D]_i)
+  \\\Eq\  & (M,s \models \E) \vee (\forall t\; sR_it \Imp M,t \models \G)
+  \\\Imp\ & (M,s \models \E) \vee (\forall t\; sR_it \Imp M,t \models \D)
+   && \text{by rule }R
+  \\\Eq\  & (M,s \models \E) \vee (M,s \models [\D]_i)
+  \\\Eq\  & M,s \models \E,[\D]_i
+
+The proof for the case with zero and with two sequents above the line is analogous.
+
+%FORMULA: soundness-deep-2
+%          & (M,s \models \E,[\G_1]_i)  \et  (M,s \models \E,[\G_2]_i)
+%          %TODO
+%  \\\Eq\  & (M,s \models \E) \vee (M,s \models [\D]_i)
+%  \\\Eq\  & (M,s \models \E) \vee (\forall t\; sR_it \Imp M,t \models \G)
+%  \\\Imp\ & (M,s \models \E) \vee (\forall t\; sR_it \Imp M,t \models \D)
+%  \\\Eq\  & (M,s \models \E) \vee (M,s \models [\D]_i)
+%  \\\Eq\  & M,s \models \E,[\D]_i
+
+Now let us look at the modal rules.
+First the box rule. Validity is simple, because the semantics of $[\phi\Pos]_i$ are exactly the same as those of $\BB_i\phi\Pos$.
+
+FORMULA: soundness-box
+          & \models \E,[\phi\Pos]_i
+  \\\Imp\ & M,s \models \E,[\phi\Pos]_i
+  \\\Eq\  & (M,s \models \E) \vee (\forall t\; sR_it \Imp M,t \models \phi)
+  \\\Eq\  & (M,s \models \E) \vee (M,s \models \BB_i \phi)
+  \\\Eq\  & M,s \models \E, \BB_i \phi\Pos
+
+The diamond rule is harder, it states that if in each world $\D$ or $\phi^+$ holds, then
+either $\D$ holds everywhere, or there is a world in which $\D$ does not hold and where hence $\phi^+$ holds.
+
+FORMULA: soundness-diamond
+          & M,s \models \G,[\D,\phi\Neg]_i
+  \\\Eq\  & (M,s \models \G) \vee (\forall t\; sR_it \Imp M,t \models \D,\phi\Neg)
+  \\\Eq\  & (M,s \models \G) \vee \bigl(\forall t\; sR_it \Imp (M,t \models \D) \vee (M,t \not\models \phi) \bigr)
+  \\\Imp\ & (M,s \models \G) \vee (\forall t\; sR_it \Imp M,t \models \D) \vee (\exists t\; sR_it \Imp M,t \models \phi)
+  \\\Eq\  & (M,s \models \G) \vee (M,s \models [\D]_i) \vee (M,s \models \DD_i \phi)
+  \\\Eq\  & M,s \models \G, [\D]_i, \DD_i \phi\Pos
+
+%FORMULA: soundness-box-match
+%          & M,s \models \G,[\D,\phi\Neg]_i
+%  \\\Eq\  & (M,s \models \G) \vee (\forall t\; sR_it \Imp M,t \models \D,\phi\Neg)
+%  \\\Eq\  & (M,s \models \G) \vee \bigl(\forall t\; sR_it \Imp (M,t \models \D) \vee (M,t \not\models \phi) \bigr)
+%  \\\Imp\ & (M,s \models \G) \vee (\forall t\; sR_it \Imp M,t \models \D) \vee (\exists t\; sR_it \Imp M,t \not\models \phi)
+%  \\\Eq\  & (M,s \models \G) \vee (\forall t\; sR_it \Imp M,t \models \D) \vee (\neg\forall t\; sR_it \Imp M,t \models \phi)
+%  \\\Eq\  & (M,s \models \G) \vee (M,s \models [\D]_i) \vee (M,s \not\models \BB_i \phi)
+%  \\\Eq\  & M,s \models \G, [\D]_i, \BB_i \phi\Neg
+
+Again, soundness holds by induction over derivations.
+
+-- Soundness of extra rules --
+
+We have also introduced rules for classes of models such as those were relations are reflexive or transitive.
+These rules are ''not'' valid in all models, but only in those models that have these extra properties.
+
+A relation $R$ is serial if $\forallx \existsy xRy$, there is always an outgoing relation.
+Let $M$ be a serial model, then the D rule is valid:
+FORMULA: soundness-D
+          & M,s \models \G, \BB_i \phi\Pos
+  \\\Eq\  & (M,s \models \G) \vee (M,s \models \BB_i \phi)
+  \\\Eq\  & (M,s \models \G) \vee (\forall t\; sR_it \Imp M,s \models \phi)
+  \\\Imp\ & (M,s \models \G) \vee (\exists t\; sR_it \Imp M,s \models \phi) & \text{by seriality of }R_i\text{ such a $t$ exists}
+  \\\Eq\  & (M,s \models \G) \vee (M,s \models \DD_i \phi)
+  \\\Eq\  & M,s \models \G, \DD_i \phi
+
+A relation $R$ is reflexive if $\forallx xRx$.
+For all reflexive models $M$ the T rule preserves validity:
+FORMULA: soundness-T
+          & M,s \models \G, \phi\Pos
+  \\\Eq\  & (M,s \models \G) \vee (M,s \models \phi)
+  \\\Eq\  & (M,s \models \G) \vee (tR_it \et M,s \models \phi) & \text{by reflexivity of }R_i
+  \\\Imp\ & (M,s \models \G) \vee (\exists t\; sR_it \Imp M,s \models \phi)
+  \\\Eq\  & (M,s \models \G) \vee (M,s \models \DD_i \phi)
+  \\\Eq\  & M,s \models \G, \DD_i \phi
+
+A relation $R$ is transitive if $\forallx,y,z (xRy \et yRz) \imp xRz$.
+Let $M$ be a transitive model, then the 4 rule preserves validity:
+FORMULA: soundness-4
+          & M,s \models \G, \world{\D}_i, \BB_i \phi\Pos
+  \\\Eq\  & (M,s \models \G) \vee (M,s \models \world{\D}_i) \vee (M,s \models \BB_i \phi)
+  \\\Eq\  & (M,s \models \G) \vee (M,s \models \world{\D}_i) \vee (\forall u\; sR_iu  \Imp M,u \models \phi)
+  \\\Imp\ & (M,s \models \G) \vee (M,s \models \world{\D}_i) \vee (\forall t,u\; sR_it \et tR_iu  \Imp M,u \models \phi)
+          && \text{by transitivity of }R_i
+  \\\Eq\  & (M,s \models \G) \vee (M,s \models \world{\D}_i) \vee (\forall t\; sR_it \Imp M,t \models \BB_i \phi)
+  \\\Eq\  & (M,s \models \G) \vee (\forall t\; sR_it \Imp M,t \models \D) \vee (\forall t\; sR_it \Imp M,t \models \BB_i \phi)
+  \\\Imp\ & (M,s \models \G) \vee \bigl(\forall t\; sR_it \Imp (M,t \models \D) \vee (M,t \models \BB_i \phi) \bigr)
+  \\\Eq\  & M,s \models \G, \world{\D, \BB_i \phi\Pos}_i
+
+And finally, 
+a relation $R$ is euclidean if $\forallx,y,z (xRy \et xRz) \imp yRz$.
+Let $M$ be a euclidean model, then the 5 rule preserves validity:
+
+FORMULA: soundness-5
+          & M,s \models \G, \world{\D}_i, \DD_i \phi\Pos
+  \\\Eq\  & (M,s \models \G) \vee (M,s \models \world{\D}_i) \vee (M,s \models \DD_i \phi)
+  \\\Eq\  & (M,s \models \G) \vee (M,s \models \world{\D}_i) \vee (\exists u\; sR_iu  \et M,u \models \phi)
+  \\\Imp\ & (M,s \models \G) \vee (M,s \models \world{\D}_i) \vee (\forall t\; sR_it \Imp \exists u\; sR_iu \et M,u \models \phi)
+  \\\Imp\ & (M,s \models \G) \vee (M,s \models \world{\D}_i) \vee (\forall t\; sR_it \Imp \exists u\; tR_iu \et M,u \models \phi)
+          && \text{by euclidicity of }R_i
+  \\\Eq\  & (M,s \models \G) \vee (M,s \models \world{\D}_i) \vee (\forall t\; sR_it \Imp M,t \models DD_i \phi)
+  \\\Eq\  & (M,s \models \G) \vee (\forall t\; sR_it \Imp M,t \models \D) \vee (\forall t\; sR_it \Imp M,t \models \DD_i \phi)
+  \\\Imp\ & (M,s \models \G) \vee \bigl(\forall t\; sR_it \Imp (M,t \models \D) \vee (M,t \models \DD_i \phi) \bigr)
+  \\\Eq\  & M,s \models \G, \world{\D, \DD_i \phi\Pos}_i
+
+
+<br>We have now shown that all rules we have introduced preserve semantic validity.
+If the assumptions are valid, then so is the conclusion.
+Now given a derivation of $\phi$,
+by induction over the structure of that derivation it must be the case that $\phi$ is valid,
+possibly with respect to a class of Kripke models.
+
+
+
+[[CONT: counter-models.html|Completeness]]

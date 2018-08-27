@@ -1,0 +1,39 @@
+Downloading
+
+-- Downloads --
+
+ <ul>
+   <li style="list-style:url(style/pdf.png)"    ><a href="download/moltap-users-guide.pdf">The users guide in PDF format</a>
+   <li style="list-style:url(style/haddock.png)"><a href="haddock">Browse source code documentation</a>
+   <li style="list-style:url(style/zip.png)"    ><a href="download/Moltap-0.2.tar.gz">Download source code</a>
+   <li style="list-style:url(style/win.png)"    ><a href="download/moltap-win32.zip">Windows command line executable</a>
+   <li style="list-style:url(style/linux.png)"  ><a href="download/moltap-linux-x86.gz">Linux command line executable (x86)</a>
+   <li style="list-style:url(style/linux.png)"  ><a href="download/moltap-linux-x86-64.gz">Linux command line executable (x86-64)</a>
+ </ul>
+
+-- Source code --
+
+To be able to build the source code you need the following programs:
+
+ </p><ul>
+   <li> <a href="http://haskell.org/ghc">Ghc: the Glasgow Haskell Compiler</a>, version 6.6 or newer.
+   <li> <a href="http://graphviz.org">GraphViz</a>
+   <li> the following Haskell libraries: <ul>
+        <li> <a href="http://hackage.haskell.org/cgi-bin/hackage-scripts/package/Cabal">Cabal</a>
+        <li> <a href="http://hackage.haskell.org/cgi-bin/hackage-scripts/package/mtl">mtl</a>
+        <li> <a href="http://hackage.haskell.org/cgi-bin/hackage-scripts/package/parsec-2.1.0.0">parsec</a>
+        <li> <a href="http://hackage.haskell.org/cgi-bin/hackage-scripts/package/filepath">filepath</a>
+        <li> <a href="http://hackage.haskell.org/cgi-bin/hackage-scripts/package/utf8-string">utf8-string</a>
+        <li> <a href="http://hackage.haskell.org/cgi-bin/hackage-scripts/package/cgi-3001.1.5.2">cgi</a> (for the web front-end)
+        </ul>
+        Note that some of these libraries already come packaged with many Ghc distributions.
+  </ul><p>
+
+On both Linux and Windows the source code can than be built by executing:
+] sh build.sh
+Or if some libraries are installed locally:
+] sh build.sh --user
+This builds both the documentation and the two front ends. To only build the programs pass the --no-doc flag, or build manually with
+] runghc Setup configure
+] runghc Setup build
+] runghc Setup install

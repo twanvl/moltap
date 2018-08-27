@@ -1,0 +1,29 @@
+\documentclass[a4paper]{article}
+\usepackage{listings}
+\usepackage{morespace}
+\usepackage{graphicx}
+\input{prelude}
+
+\lstset{
+  frame=true,
+  morestring=[b]",
+  mathescape=true,
+  escapechar=!
+}
+
+\title{MOLTAP : A Modal Logic Tableau Prover\\Users guide}
+\author{Twan van Laarhoven}
+
+\begin{document}
+
+\maketitle
+
+\newcommand{\heading}{\section}
+\newcommand{\subheading}{\subsection}
+\input{page-users-guide}
+
+\section{Syntax reference}
+\renewcommand{\heading}{\subsection}
+\input{page-syntax}
+
+\end{document}

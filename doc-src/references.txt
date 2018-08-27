@@ -1,0 +1,25 @@
+References
+
+* <div><a href="http://www.ai.rug.nl/~valkenhoef/oops/" name="oops">OOPS &ndash; Object Oriented Prover for S5<sub>n</sub></a>
+.. <br> ''Elske van der Vaart'' and ''Gert van Valkenhoef''
+.. <br> Multi Agent Systems, Rijksuniversiteit Groningen, 2007</div>
+* <div><a href="http://www.uni-koblenz.de/~beckert/modlean/" name="freevar">Free Variable Tableaux for Propositional Modal Logics</a>
+.. <br> ''Bernhard Beckert'' and ''Rajeev Gor&eacute;''
+.. <br> Proceedings, International Conference on Theorem Proving with Analytic Tableaux and Related Methods, Pont-a-Mousson, France, 1997.</div>
+* <div><a href="http://www.lwb.unibe.ch/" name="lwb">The Logics Workbench</a>
+.. <br> ''Gerhard Jaeger'', ''Peter Balsiger'', ''Alain Heuerding'', ''Stefan Schwendimann'' and others.</div>
+* <div><a href="http://www.coli.uni-saarland.de/projects/milca/courses/comsem/">Computational Semantics</a>: <a href="http://www.coli.uni-saarland.de/projects/milca/courses/comsem/html/node147.html" name="tab-calc">Tableaux Calculi</a>
+.. <br> ''Aljoscha Burchardt'', ''Stephan Walter'', ''Alexander Koller'', ''Michael Kohlhase'', ''Patrick Blackburn'' and ''Johan Bos''
+.. <br> MiLCA (Medienintensive Lehrmodule in der Computerlinguistik-Ausbildung)</div>
+* <div><a href="http://books.google.com/books?id=x9x6F_4mUPgC" name="basic-proof-theory">Basic Proof Theory</a>
+.. <br> ''A. S. Troestra'' and ''H. Schwichtenberg''
+.. <br> pp 51&ndash;75
+.. <br> Cambridge University Press, 1996, ISBN 0521572231.</div>
+* <div><a href="http://books.google.com/books?id=WgXyLRyEO8AC" name="epistemic">Epistemic Logic for AI and Computer Science</a>
+.. <br> ''W. van der Hoek'' and ''J.-J. Ch. Meyer''
+.. <br> Cambridge University Press, paperback edition 2004, ISBN 0521602807.</div>
+* <div><a href="http://www.st.cs.uni-sb.de/edu/seminare/2005/advanced-fp/docs/huet-zipper.pdf" name="zipper">Functional Pearl: The Zipper</a>
+.. <br> ''G&eacute;rard Huet''
+.. <br> J. Functional Programming 7 (5): 549&ndash;554, September 1997</div>
+* <div><a href="http://www.haskell.org/haskellwiki/?title=Zipper&oldid=20184" name="zipper2">HaskellWiki on The Zipper</a>
+.. <br> Various authors</div>

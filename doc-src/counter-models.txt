@@ -1,0 +1,130 @@
+Counter models &amp; completeness
+
+-- Generating a model --
+
+--- Maximal sets ---
+
+When the proof search fails we have a sequent to which no further rules can be applied.
+We call the resulting sequents maximal sequents.
+
+'''Definition:'''
+We say that a set $\Gamma$ is ''maximal'' when
+* $\T \Gamma$ is not an axiom.
+* $\T \Gamma$ is not the consequence of a rule whose principal formulas have not been used before.
+
+Two important properties of maximal sets $\G$ are
+* Because of the "deep" meta-rules, for all $[\D]_i \in \G$, $\D$ is also maximal.
+* A maximal set can not contain both $p\Pos$ and $p\Neg$.
+
+--- Building the model ---
+
+From a maximal set $\Phi$ we can generate a model.
+A maximal set represents a failed search for a proof, if one of the elements of the set were true we would be done.
+So the idea is to generate a model where everything in the maximal set is ''false''.
+
+We define our counter model $M_\Phi = \tup{S_\Phi,R,V}$ by
+
+FORMULA: counter-worlds
+  S_\G = \{ s_\G \} \cup \bigcup\nolimits_{[\D]_i\in\G} S_\D
+FORMULA: counter-relations
+  s_\G R_i s_\D  \Eq  [\D]_i\in\G
+FORMULA: counter-valuation
+  V(s_\G) = \{ p \mid p\Neg \in \G \}
+
+So there is a world for the maximal set $\Phi$ itself,
+and for all $[\D]_i$ in $\Phi$ there is world $s_\D$ that is accessible from $s_\Phi$ by agent $i$.
+We then choose the valuation such that precisely those propositions are true that occur negatively in the set.
+
+-- Completeness --
+
+--- Truth lemma ---
+
+The next step in the completeness proof is 
+
+FORMULA: truth-lemma
+  \psi^\pm \in \G  \,\Imp\,  M_\Phi,s_G \not\models \psi^\pm
+
+The proof proceeds by induction over the structure of the formula $\chi$ and the relations $R_i$.
+
+Assume the induction hypothesis; that given a signed formula $\chi^\pm$ the truth lemma holds for
+# all subformulas of $\chi$, and
+# all sets $\D$ where $[\D]_i \in \G$.
+
+Then to show that the truth lemma holds for $\chi^\pm$ there is a case to consider for each type of signed formula:
+# $p\Neg \in \G$<br> then by definition $p \notin V(s_\G)$.
+.. So $M,s_G \models p$ and $M,s_G \not\models p\Neg$.
+# $p\Pos \in \G$<br> then because $\Phi$ is maximal, $p\Neg \notin \G$ and hence by definition $p \notin V(s_\G)$.
+.. So $M,s_G \not\models p\Pos$
+# $\psi \et \chi\Pos \in \G$<br> then because of maximality either $\psi\Pos \in \G$ or $\chi\Pos \in \G$; otherwise the $\et\Pos$ rule could be applied to the sequent and it would not have been maximal.
+.. Let's say that $\psi\Pos \in \G$.
+.. By the induction hypothesis we may assume that $M,s_G \not\models \psi\Pos$, so also $M,s_G \not\models \psi \et \chi\Pos$
+# $\psi \vee \chi\Pos \in \G$<br> then because of maximality either $\psi\Pos \in \G$ and $\chi\Pos \in \G$; otherwise the $\et\Pos$ rule could be applied to the sequent and it would not have been maximal.
+.. By the induction hypothesis we may assume that $M,s_G \not\models \psi\Pos$ and $M,s_G \not\models \chi\Pos$.
+.. So also $M,s_G \not\models \psi \vee \chi\Pos$.
+# $\BB_i \psi\Pos \in \G$<br> then there exists a $[\D]_i \in \G$ with $\psi\Pos \in \D$.
+.. By the induction hypothesis we have $M,s_D \not\models psi\Pos$.
+.. Since $[\D]_i \in \G$ we have that $s_GR_is_D$, so $M,s_D \not\models \BB_i psi\Pos$.
+# $\BB_i \psi\Neg \in \G$.<br>
+.. Let $\D$ be an arbitrary sequent such that $s_GR_is_D$, so $[\D]_i \in \G$.
+.. Then because of maximality it must be the case that $\psi\Neg \in \D$,
+.. otherwise rule $\BB\Neg$ could be applied to $\G$.
+.. By the induction hypothesis we have $M,s_D \not\models psi\Neg$.
+.. Because the choice of $\D$ was arbitrary this holds for all such $\D$ and hence $M,s_G \not\models \BB_i \psi\Neg$.
+# The other cases for duals of the above formulas are analogous.
+
+So by induction the truth lemma holds for all $\chi^\pm \in \G$ for all $\G$ with $s_G \in S_\Phi$.
+
+--- Termination ---
+
+One final piece of the completeness puzzle remains.
+It must be possible to construct either a maximal set or a valid derivation for all formulas.
+
+This derivation is constructed with a proof search, as described <a href="tableaux-propositional.html#the-proof-search-algorithm">previously</a>.
+In the proof search rules are applied bottom up for as long as possible.
+
+All logical rules, when used from the bottom to the top, either
+* add subformulas of the current formula to the sequent (all propositional rules and the $\BB\Neg$ rule), or
+* add a nested sequent containing subformulas (the $\BB\Pos$ rule), or
+* move formulas out of nested sequents (the 4 and 5 rules).
+In the first two cases only smaller things are added.
+Formulas of the third type can only be used a finite number of times, since 
+
+The input formula is finite, so eventually no more subformulas can be added.
+Therefore, the proof search always terminates.
+
+--- Completeness ---
+
+We apply the above proof search algorithm to a formula $\phi\Pos$ that is not valid ($\not\models \phi\Pos$).
+Because of <a href="soundness.html">soundness</a> the proof search must fail,
+so we end up with a maximal set $\Phi$.
+From this set a counter model $M_\Phi$ is then generated.
+
+With the copying meta-rule we have ensured that $\phi\Pos \in \Phi$.
+By the truth lemma then $M,s_\G \not\models \psi$.
+We have found our counter model.
+
+So if the search for a proof of $\phi$ fails, it must be the case that $\phi$ is not valid.
+And since the proof search always terminates the proof search for all valid formulas must succeed;
+our logic is complete, $\models \phi\Pos \Imp \T \phi\Pos$.
+
+-- Simplifying the model --
+
+Counter models are not just interesting from a theoretical point of view, they can also be interesting to the user of a theorem prover.
+For example, when entering [[EX: a -> K_1 K_1 a]] the (S5) proof search will terminate with the maximal set
+FORMULA: maxset-example-1
+  \Phi = a \imp K_1 K_1 a\Pos ,\, a\Neg ,\, K_1 K_1 a\Pos ,\, [K_1 a\Pos]_1 ,\, [a\Pos]_1
+
+The model generated from this set will contain three worlds, one for $\Phi$, one for $[K_1 a\Pos]_1$ and one for $[a\Pos]_1$.
+To ensure that what we end up with is an S5 model reflexive, transitive and symmetric arrows are added.
+Graphically the resulting model will look like:
+ <img src="image/model-a-imp-KKa.png" alt="A counter model for 'a -&gt; K1 a'" class="graph"/>
+
+Clearly the world $s_{K_1 a\Pos}$ in the bottom right is superfluous and can be removed.
+The program therefore contains a very simple algorithm to minimize models:
+# For each world in $M$, construct a model $M'$ with that world removed.
+# For each pair of world in $M$, construct a model $M'$ with those two worlds merged.
+.. That is, the union taken of the valuation and of the outgoing and incoming relations.
+# If such an $M'$ is sill a counter model to $\phi$, then repeat.
+
+After minimizing the model becomes simply
+ <img src="image/model-a-imp-Ka.png" alt="A minimized model for 'a -&gt; K1 a'" class="graph"/>

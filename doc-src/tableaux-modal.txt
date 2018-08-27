@@ -1,0 +1,141 @@
+Tableaux for modal formulas
+
+-- Hierarchical sequents --
+
+In modal logic reasoning about just truth and falsehood is no longer sufficient.
+A formula $\phi$ can be true in one world and false in another, we have to take worlds into account.
+Our sequents as defined previously have no such notion.
+
+To do this we will create a tree of sequents, one for each set of worlds that we consider.
+The root of this tree will correspond to ''all'' worlds, while a child corresponds only to worlds reachable by a certain agent.
+We write down this tree as a hierarchical sequent.
+
+'''Definition''':
+A ''hierarchical sequent'' is a set of signed formulas and nested hierarchical sequents.
+We use the notation $[\G]_i$ for a nested sequent that represents a world reachable by agent $i$.
+
+To give a concrete example consider the hierarchical sequent
+FORMULA: hierarchical-sequent-example1
+  \Gamma = p\Pos, [q \et \neg p\Pos, p\Neg]_1, [q\Neg]_2
+This hierarchical sequent corresponds directly to the formula $p \vee \BB_1((q \et \negp) \vee p) \vee  \BB_2(\negq)$.
+We can also draw the sequent in a graph that looks very much like a model:
+GRAPH: hierarchical-sequent-example1-graph
+  node[shape=circle,margin=0]
+  w1[label=<p \Pos>,shape=doublecircle]
+  w2[label=<q \et \negp\Pos<br/> p \Neg>]
+  w3[label=<q \Neg>]
+  w1->w2 [label=1,len=1.3]
+  w1->w3 [label=2,len=1.3]
+The arrows go to ''arbitrary'' worlds,
+so in the image if we manage to proof $q\Neg$ for this arbitrary world on the right
+we have indeed shown that $q\Neg$ must be true in ''all'' worlds reachable by agent 2.
+
+Semantically nested sequents behave the same as the $\BB$ operator.
+The difference is that a nested sequent contains a whole set of signed formulas and nested sequents, not just a single subformula.
+FORMULA: semantics-hierarchical
+  \begin{array}{lcl}
+  M,s \models \world{\G}_i  &\EQ&  \forall t\; sR_it \Imp M,t \models \G\\
+  \end{array}
+
+There is now a minor technical problem: how do we work with these sequents?
+We are not allowed to use any rules 'inside' nested sequents, while out intention is that that is possible.
+To work around this problem we introduce the ''deep application'' meta-rules:
+FORMULA: rule-deep
+  \begin{array}{ccc}
+  \ptop[Ax]{ \T \G }
+    &\raisebox{0mm}{\IMP}&
+  \ptop[\deep{Ax}{i}]{ \T \E, [\G]_i } \\\\
+  \prule[R]{ \T \G }{ \T \D }
+    &\raisebox{3mm}{\IMP}&
+  \prule[\deep{R}{i}]{ \T \E, [\G]_i }{ \T \E, [\D]_i } \\\\
+  \prule[R]{ \T \G_1 & \T \G_2 }{ \T \D }
+    &\raisebox{3mm}{\IMP}&
+  \prule[\deep{R}{i}]{ \T \E, [\G_1]_i & \T \E, [\G_2]_i }{ \T \E, [\D]_i }
+  \end{array}
+These meta-rules allow us to apply rules and axioms inside nested sequents,
+any rule that can turn a sequent inside brackets from $\G$ into $\D$ can now also work on $[\G]_i$, turning it into $[\D]_i$.
+
+-- Modal rules --
+
+With hierarchical sequents the rule for the modal box operator becomes simple
+FORMULA: rule-box-pos
+  \prule[\BB\Pos]
+  { \T \G, \world{ \phi\Pos }_i }
+  { \T \G, \BB_i \phi\Pos }
+  &&
+  \prule[\DD\Neg]
+  { \T \G, \world{ \phi\Neg }_i }
+  { \T \G, \DD_i \phi\Neg }
+Semantically the sequent above and below the line are exactly the same.
+
+On its own the box rule is not very useful, we can not use it to prove more interesting modal formulas.
+These formulas will also contain negatively occurring boxes (or positive diamonds).
+What does $\BB_i \phi\Neg$ mean? It means that there is a world in which $\phi$ does not hold.
+Since any world will do, so will the arbitrary world from the positive box rule.
+If we can show $\phi\Neg$ in that world the proof is complete.
+So all we have to do is add $\phi\Neg$ to the each nested sequent:
+
+FORMULA: rule-box-neg
+  \prule[\BB \Neg]
+  { \T \G, \world{\D, {\phi \Neg}}_i, {\BB_i \phi \Neg} }
+  { \T \G, \world{\D}_i, {\BB_i \phi \Neg} }
+  &&
+  \prule[\DD \Pos]
+  { \T \G, \world{\D, {\phi \Pos}}_i, {\DD_i \phi \Pos} }
+  { \T \G, \world{\D}_i, {\DD_i \phi \Pos} }
+
+Note that in this rule it becomes important to keep a copy of the $BB_i\phi\Neg$ formula.
+The reason is that there might be more than one nested sequent and we need to add $\phi\Neg$ to each of them.
+To avoid problems with non-termination we require that $\phi\Pos \notin \D$ before the rule is applied.
+
+-- Example --
+
+As an example consider a derivation of the K-distribution 'axiom': @K_1 (a &rarr; b) &rarr; ( K_1 a &rarr; K_1 b)@.
+For brevity reasons the unused formulas are not included.
+
+FORMULA: example-derivation2
+  \infer[\n{\imp\Pos}]
+  { \T K_1 (a \imp b) \imp ( K_1 a \imp K_1 b) \Pos }
+  { \infer[\n{\imp\Pos}]
+    { \T K_1 (a \imp b) \Neg ,\, K_1 a \imp K_1 b \Pos }
+    { \infer[\n{\BB\Pos}]
+      { \T K_1 (a \imp b) \Neg ,\, K_1 a \Neg ,\, K_1 b \Pos }
+      { \infer[\n{\BB\Neg}]
+        { \T K_1 (a \imp b) \Neg ,\, K_1 a \Neg ,\, \world{b\Pos}_1 }
+        { \infer[\n{\BB\Neg}]
+          { \T K_1 (a \imp b) \Neg ,\, \world{b\Pos, a\Neg}_1 }
+          { \infer[\n{\deep{\imp\Neg}{1}}]
+            { \T \world{a \imp b\Neg, b\Pos, a\Neg}_1 }
+            { \inferT[\n{\deep{Assum}{1}}]
+              { \T \world{a\Pos, b\Pos, a\Neg}_1 }
+            & \inferT[\n{\deep{Assum}{1}}]
+              { \T \world{b\Neg, b\Pos, a\Neg}_1 }
+            }
+          }
+        }
+      }
+    }
+  }
+
+Graphically:
+GRAPH: example-derivation2-graph
+  edge[len=1.3]
+  w0[shape=rectangle,pos="0,0",label=<
+  K_1 (a \imp b) \imp ( K_1 a \imp K_1 b) \Pos<br/>
+  K_1 (a \imp b) \Neg<br/>
+  K_1 a \Neg<br/>
+  K_1 b \Pos>]
+  w3[pos="4,0",label=<a \Neg<br/>a \imp b \Neg<br/>b \Neg>]
+  w0->w3 [label="1",len=1.5]
+
+Including all unused formulas the left application of the axiom is to
+
+FORMULA: example-derivation2-color
+  \T \Old{K_1 (a \imp b) \imp ( K_1 a \imp K_1 b) \Pos},
+     \New{K_1 (a \imp b) \Neg},
+     \Old{K_1 a \imp K_1 b \Pos},
+     \New{K_1 a\Neg},
+     \Old{K_1 b\Neg},
+     \world{\Old{a \imp b\Neg}, \New{a\Pos}, \New{b\Pos}, \New{a\Neg}}_1
+
+[[CONT: tableaux-system.html|Systems KD, S4, S5, etc.]]

@@ -1,0 +1,78 @@
+Common knowledge
+
+-- Common knowledge --
+
+If some formula $\phi$ is knowledge in a group then all agents know $\phi$.
+But $\phi$ is not yet common knowledge.
+We consider something to be common knowledge only if everyone ''knows'' that it is common knowledge.
+
+Intuitively the common knowledge operator $\BB*_I \phi$ can be defined as
+FORMULA: semantics-common-1
+  \BB^*_I \phi \EQ \phi \et \BB_I \phi \et \BB_I \BB_I \phi \et \BB_I \BB_I \BB_I \phi \et \cdots
+More formally, the semantics is given by
+FORMULA: semantics-common-2
+  \begin{array}{lcl}
+  M,s \models \BB_I \phi      &\EQ& \forall t\; sR_I^*t \Imp M,t \models \phi
+  \end{array}
+Where $R_I*$ is the reflexive transitive closure of the relation $R_I$.
+
+-- Assumptions of common knowledge --
+
+We can use the first definition of the common knowledge operator as a rule.
+When we encounter $\BB*_I \phi$ we can expand this for one step to obtain $\phi \et \BB_I \BB*_I \phi$.
+This gives the following rule:
+
+FORMULA: rule-common-neg
+  \prule[\DD^*{}\Pos]
+  { \T \G, \phi\Pos, \DD_I \DD^*_I \phi\Pos }
+  { \T \G, \DD^*_I \phi\Pos }
+  &&
+  \prule[\BB^*{}\Neg]
+  { \T \G, \phi\Neg, \BB_I \BB^*_I \phi\Neg }
+  { \T \G, \BB^*_I \phi\Neg }
+
+A problem with using this rule in a proof search
+is that we are making formulas larger.
+Usually everything goes well, because the new $\BB_I$ operators are only taken apart when there is a matching nested sequent.
+But what if the expansion of the common knowledge operator create these sequents?
+
+Consider the formula $\neg\BB_I*\DD_I p$. The proof search would go as follows (ignoring used formulas):
+FORMULA: common-proof-problem
+  \infer[\neg\Pos]
+  { \T \neg\BB_I^*\DD_I p\Pos }
+  { \infer[\BB^*{}\Neg]
+    { \T \BB_I^*\DD p\Neg }
+    { \infer[\DD\Neg]
+      { \T \DD_I p\Neg, \BB_I\BB_I^*\DD_I p\Neg }
+      { \infer[\BB\Neg]
+        { \T \world{p\Neg}_I, \BB_I\BB_I^*\DD_I p\Neg }
+        { \infer[\BB^*{}\Neg]
+          { \T \world{p\Neg,\BB_I^*\DD_I p\Neg}_I }
+          { \infer[\DD\Neg]
+            { \T \world{p\Neg,\DD_I p\Neg,\BB\BB_I^*\DD_I p\Neg}_I }
+            { \infer
+              { \T \world{p\Neg,\world{p\Neg}_I,\BB\BB_I^*\DD_I p\Neg}_I }
+              { \vdots }
+            }
+          }
+        }
+      }
+    }
+  }
+This search can go on forever, the same world for $\DD_I p\Neg$ is created over and over again.
+We need a way to detect this loop, and stop the search.
+Fortunately in systems with rule 4 such as system S5 this situation does not occur,
+since with that rule a $\DD\Neg$ is never used inside a nested sequent for agent $i$.
+
+
+-- Proving common knowledge --
+
+Rules for common knowledge as a goal are more complicated.
+We could try the same trick as for group knowledge, and have nested worlds $[\D]_I*$ for common knowledge.
+This might work in some cases, but it will not easily lead to a complete system.
+
+For that we will have to use some kind of induction rule.
+For example, consider the formula $\BB* p \imp \BB*\BB* p$.
+This formula is obviously true, and the implication in the other direction is simple to proof.
+
+It is not clear yet what rules are needed to proof all possible cases of common knowledge.

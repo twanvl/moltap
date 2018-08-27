@@ -1,0 +1,120 @@
+Representing sequents
+
+The most important part of the program lies in the representation of sequents and rules.
+
+%.. <a href="theory.html">theory</a>
+
+-- Simple sequents --
+
+In the program a sequent can be represented as a set of signed formulas.
+A sequent that contains both $\phi\Pos$ and $\phi\Neg$ is matched by an axiom, so in that case the algorithm stops.
+We therefore never need to represent such sequents.
+So instead of using a set of signed formulas we can use a mapping of normal formulas to their sign.
+For concreteness the Haskell type for sequents is
+> type Sequent = Map Formula Bool
+
+We need to make a distinction between ''used'' and ''unused'' formulas to prevent duplicate work.
+Instead of adding this information to the data type we take another approach:
+the unused formulas are represented implicitly in the structure of the program.
+
+What we mean is that we will introduce a set of functions for adding formulas to the sequent.
+Formulas that are in the map are considered used, while formulas that are added later are unused.
+For example the pseudo code
+> runSequent {!!!<span class="old">y<sup>-</sup></span>!!!} (addFormula "x<sup>+</sup>" >> addFormula "&not;x<sup>+</sup>")
+represents the sequent ${\Old{y\Neg}, \New{x\Pos}, \New{\negx\Pos}}$.
+Here @@runSequent@@ is a function that takes a sequent of used formulas and an action that adds new formulas to the sequent, and applies the action to the sequent.
+After a single step of execution the first formula is added, so the equivalent code would be
+> runSequent {!!!<span class="old">y<sup>-</sup></span>, <span class="old">x<sup>+</sup></span>!!!} (addFormula "&not;x<sup>+</sup>")
+
+--- State &amp; split ---
+
+To be a bit more concrete we use what in Haskell terminology is called a ''state monad''.
+This is a data type @@SSM a@@ together with several functions with the (simplified) types:
+> get       :: SSM Sequent
+> put       :: Sequent -> SSM ()
+> exhausted :: SSM ()
+> abort     :: SSM ()
+> (>>)      :: SSM () -> SSM () -> SSM ()
+> split     :: SSM () -> SSM () -> SSM ()
+
+@@SSM a@@ represents an ''action'' with an additional result of type @@a@@.
+* The action can access and modify the ''state'', which is the @@Sequent@@ of used formulas.
+.. Each formula that we encounter is added to this sequent.
+* An action can indicate that the proof search is @@exhausted@@ (no proof was found.
+* The search can be @@abort@@ed because a proof is found and we are done.
+* Two actions can be performed in sequence (@@>>@@), if either of them aborts then the combination also aborts.
+.. This corresponds to a rule where multiple formulas are added to the sequent, such as the disjunction rule.
+* Finally actions can be performed in parallel (@@split@@), for the split action to abort ''both'' halves must abort.
+.. This corresponds to a rule with two sequents below the line, such as the conjunction rule.
+
+We can run these actions with the @@execSSM@@ function,
+> execSSM :: Sequent -> SSM () -> Either Sequent Exhausted
+Given an initial sequent the action will either be exhausted, or it will abort in which case we are interested in the state at that point.
+
+--- Matching formulas ---
+
+This @SSM@ monad gives us all the ingredients needed to build a tableau prover.
+We simply
+# Add every formula we see to the state, checking to see if we have reached an axiom.
+# Match the outermost constructor, and recursively execute the actions for the subformulas.
+
+In Haskell pseudo code the first step is
+> memo :: Sign -> Formula -> SSM ()
+> memo sign formula = do
+>     state <- get
+>     case lookup formula state of
+>        Just sign'  | sign == sign' -> exhausted -- already seen this formula with the same sign
+>        Just sign'  | sign /= sign' -> abort     -- seen this formula with a different sign, Assum axiom
+>        Nothing                     -> do        -- not seen this formula before
+>                                          put (insert formula sign state) -- add it to the sequent
+>                                          inspect sign formula            -- inspect the formula
+
+The inspect function just has to inspect the formula to see what rule applies
+
+> inspect :: Sign -> Formula -> SSM ()
+> inspect Pos (Truth True)  = abort                   -- axiom True
+> inspect Pos (Bin Or  a b) = memo a   >>    memo b   -- add both a and b, rule <span class="sym">&or;</span><sup>+</sup>
+> inspect Pos (Bin And a b) = memo a `split` memo b   -- both halves must succeed, rule <span class="sym">&and;</span><sup>+</sup>
+> -- etc.
+
+-- Hierarchical sequents --
+
+As described above, a simple sequent is simply a mapping from formulas to signs.
+We will keep this representation also for the parts of a hierarchical sequent.
+The hierarchy structure is then formed by a tree of these sequents, where the edges are labeled by agents.
+> type SimpleSequent = Sequent
+> type HierarchicalSequent = LabledTree Agent SimpleSequent
+
+To implement deep rule application we work with a ''current'' node in the tree.
+During the computation the current node will change as we move our focus to different nested sequents.
+
+A tree where a current node is directly available can be represented as a zipper data structure <a href="references.html#zipper">(Huet)</a>.
+A zipper consists of a sub tree below the current node and a path to parent nodes.
+See the <a href="references.html#zipper2">HaskellWiki</a> for a thorough description of zippers for trees.
+
+Suffice it here to say that the zipper data type provides operations for moving in the tree.
+When we use the @@HierarchicalSequent@@ as our state type we get the following functions:
+> getCurrent        :: SSM SimpleSequent
+> putCurrent        :: SimpleSequent -> SSM ()
+> moveDownToNewNode :: Agent -> SSM ()
+> moveBackUp        :: SSM ()
+
+The @@getCurrent@@ and @@putCurrent@@ functions can directly replace the use of @@get@@ and @@put@@ in the memo function,
+signed formulas are administrated locally in a simple sequent.
+
+The move functions allow us to implement the box rule.
+We first move down to a new world for the right agent, inspect the the subformula, and then move back up.
+> inspect Pos (Box True agent f) = moveDownToNewNode agent >> memo f >> moveBackUp
+
+The diamond and negative-box rules are harder.
+A single $\BB_i \phi\Neg$ formula can be matched with multiple nested sequents.
+At the time the $\BB_i \phi\Neg$ formula is processed those nested sequents might not even exist yet.
+We use the same trick as <a href="references.html#oops">OOPS</a> uses.
+When such a formula is encountered we add it to a list of ''necessities''.
+This is a list of actions that need to be performed in all nested sequents:
+> type Necessities = List (Agent,SSM())
+We must take care because necessities can be used in two ways:
+* For nested sequents that already exist the action must be performed when the necessity is added.
+* For nested sequents that are added later, the actions of all necessities that apply must be performed.
+
+[[CONT: implementation-model.html|Implementation of models]]

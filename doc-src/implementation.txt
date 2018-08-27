@@ -1,0 +1,43 @@
+Implementation
+
+MOLTAP is written in <a href="http://haskell.org">Haskell</a>, a functional programming language.
+In this section we will explain the main structure our implementation.
+
+-- Representing formulas --
+
+Haskell allows for a natural representation of formulas as a ''algebraic data type''.
+> data Formula
+>    = Truth   Bool
+>    | Var     VarName
+>    | Not     Formula
+>    | Bin     BinOp Formula Formula -- A binary operator
+>    | Box     Sign  Agents Formula  -- positive is box, negative is diamond.
+>    | Star    Sign  Agents Formula  -- common knowledge
+
+The prover routine will take apart formulas by pattern matching on these constructors.
+We have chosen to use as few constructors as possible, so conjunction, disjunction, etc. are all &lsquo;binary operators&rsquo;.
+
+-- The interface --
+
+There are two @@Main@@ programs.
+One for the command line version and one for the web interface.
+
+The command line interface is straight forward.
+It just reads a string from the input, parses it and feeds it to the prover.
+
+The web interface is a CGI program that does the same thing.
+It produces output in Json format (JavaScript object notation).
+For example the invocation <tt>moltap.cgi?term=p</tt> produces the output
+] {result: false
+] ,text: "<span class='nest' truth='f0'>p</span>"
+] ,modelFile: "model/p.png"
+] ,modelPos: [{node: "0", x: 34, y: 35, r: 25}]}
+This response lists
+* The result (true, false or error).
+* A syntax highlighted version of the formula, with for each subformula a "truth=..." attribute that gives the worlds in which the subformula is true.
+* The filename of the generated model.
+* The locations of the worlds in the model.
+
+The response from the CGI program is interpreted by a small piece of Javascript code that displays the result.
+
+[[CONT: implementation-tableaux.html|Representing sequents]]

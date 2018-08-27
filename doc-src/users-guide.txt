@@ -1,0 +1,79 @@
+Users guide
+
+IFHTML: <a href="download/moltap-users-guide.pdf">View the users guide in PDF format</a>.
+
+-- Web interface --
+
+--- Entering a formula ---
+
+SCREENSHOT: image/webui-input.png
+
+By default the prover web interface shows a single line textbox where a formula can be entered.
+See the <a href="syntax.html">syntax reference</a> for a description of the syntax to use.
+Press <kbd>Enter</kbd> to evaluate the formula.
+
+When a single line does not suffice,
+the input field can be expanded by clicking the downward pointing arrow on the right.
+
+% Een screenshot is wat overdreven.
+%<img src="image" class="screenshot">
+
+--- True formulas ---
+
+When a formula is valid in all worlds MOLTAP will show a green box.
+
+SCREENSHOT: image/webui-true.png
+
+--- False formulas ---
+
+For formulas that are not valid in all worlds MOLTAP will show a red box with a counter model.
+In this model the formula is false.
+When the mouse is moved over a subformula the program will indicate in which worlds this subformula is true (by a green circle) and in which worlds it is false (by a red struck circle).
+
+SCREENSHOT: image/webui-false.png
+
+
+-- Command line program --
+
+MOLTAP also comes with a command line version.
+The <a href="syntax.html">syntax</a> is exactly the same as for the web interface.
+This program supports three modes of operation
+# Read input from a file or stdin.
+# Read input from the command line.
+# A simple interactive mode.
+
+In each case one or more formulas are evaluated (proven/disproven).
+The program writes @true@ or @false@ to the output,
+and if the formula is false generates a <a href="counter-models.html">counter model</a>.
+The command line program supports the following arguments
+
+IFLATEX: \begin{tabular}{|l|l|p{9cm}|}
+! Short form             ! Long form                      ! Description
+| <kbd>FILE</kbd>        |                                | Run the program on the given input file.
+| <kbd>-?</kbd>          | <kbd>--help</kbd>              | Show help page.
+| <kbd>-i</kbd>          | <kbd>--interactive</kbd>       | Interactive mode.
+| <kbd>-f FORMULA</kbd>  | <kbd>--formula=FORMULA</kbd>   | Give a formula directly on the command line.
+| <kbd>-o FILE</kbd>     | <kbd>--model-name=FILE</kbd>   | Filename for generated model images, the default is &ldquo;model.png&rdquo;. The extension determines the generated image type.
+
+When reading input from the command line the end of file character must be used to indicate the end of the formula, use <kbd>^Z</kbd> on windows and <kbd>^D</kbd> on linux.
+
+In interactive mode each line is considered to be a formula, unless there are remaining parentheses to be closed.
+Use <kbd>:?</kbd> to show the help page and <kbd>:q</kbd> to quit.
+
+--- Example session ---
+
+] <span class="prompt">$</span> moltap
+] x | ~x
+] ^Z
+] <span class="output">true</span>
+] <span class="prompt">$</span> moltap -f "p -> K1 p"
+] <span class="output">false</span>
+] <span class="prompt">$</span> view model.png
+] <img src="image/model-p-K1-p.png" alt="model">
+] <span class="prompt">$</span> moltap -i
+] <span class="prompt">></span> K{1,2} p -> (
+] <span class="prompt">..</span> K1 p & K2 p
+] <span class="prompt">..</span> )
+] <span class="output">true</span>
+] <span class="prompt">></span> :q
+] <span class="output">Goodbye</span>

@@ -1,0 +1,647 @@
+
+/* ================================================================== Header */
+
+body {
+	margin:			0;
+	padding:		0;
+	font-family:		sans-serif;
+	background:		rgb(50,50,50);
+	color:			black;
+}
+
+#header {
+	background:		rgb(80,177,42) url(header-bg.png) left bottom;
+	padding-top:		10px;
+	border-bottom:		2px solid black;
+	line-height:		150%;
+	color:			white;
+	position:		relative;
+	z-index:		1;
+}
+h1 {
+	position:		relative;
+	padding:		0;
+	margin:			0;
+	margin-left:		10px;
+	margin-bottom:		15px;
+	font-family:		"century gothic", sans-serif;
+	font-weight:		normal;
+	letter-spacing:		.1ex;
+	word-spacing:		.1ex;
+	font-size:		190%;
+}
+h1 abbr {
+	font-variant:		small-caps;
+	font-size:		120%;
+	letter-spacing:		-.12ex;
+	position:		relative;
+	top:			3px;
+}
+h1 a {
+	color:			inherit !important;
+	text-decoration:	none;
+}
+h1 span {
+	position:		relative;
+}
+h1 .shadow {
+	position:		absolute;
+	top:			1px;
+	left:			1px;
+	color:			black;
+	opacity:		0.3;
+	-moz-opacity:		0.3;
+}
+* html h1 .shadow {
+	display:		none;
+}
+#header .author {
+	font-family:		"century gothic", sans-serif;
+	font-size:		80%;
+	position:		absolute;
+	right:			.5em;
+	bottom:			0px;
+}
+
+/* ================================================================== Navigation */
+
+#nav {
+	float:			right;
+	margin-top:		1.3em;
+	margin-right:		1.3em;
+	width:			13em;
+	z-index:		1;
+}
+*html #nav {
+	margin-right:		.75em;
+}
+#nav h3 {
+	margin:			0;
+	padding:		.3em;
+	font-size:		100%;
+	font-weight:		normal;
+	background:		black;
+	color:			white;
+}
+#nav ul + h3 {
+	margin-top:		.5em;
+}
+#nav ul, #nav p {
+	list-style:		none;
+	margin:			.2em;
+	padding:		0;
+}
+#nav ul {
+	margin-top:		1px;
+}
+#nav ul li + li {
+	border-top:		1px solid rgb(120,120,120);
+}
+#nav ul a {
+	display:		block;
+	padding:		.2em;
+	color:			rgb(230,230,230);
+	text-decoration:	none;
+}
+#nav ul a:hover {
+	background:		rgb(100,100,100);
+	color:			white;
+}
+#nav ul a.current {
+	background:		rgb(80,177,42) url(button-bg.png) left center repeat-x;
+	color:			white;
+}
+#nav p {
+	font-size:		80%;
+	color:			rgb(230,230,230);
+}
+#nav p a {
+	color:			rgb(230,230,230);
+}
+#nav p a:hover {
+	background:		rgb(100,100,100);
+	color:			white;
+}
+
+/* ================================================================== Body */
+
+#main {
+	position:		relative;
+	z-index:		1;
+	margin-right:		15.6em;
+	margin-left:		1.2em;
+	background:		white;
+	padding:		1.5em;
+	padding-top:		1.2em;
+	font-family:		serif;
+}
+#behind {
+	position:		absolute;
+	left:			1.2em;
+	right:			15.6em;
+	top:			0;
+	bottom:			0;
+	background:		white;
+}
+
+/* ================================================================== Input */
+
+#ui {
+	margin-right:		1.3em;
+}
+input.term,
+textarea.term {
+	background:		rgb(240,240,240);
+	background-repeat:	repeat-x;
+	border:			2px solid rgb(105,105,105);
+	padding:		.2em;
+	box-sizing:		border-box;
+	-moz-box-sizing:	border-box;
+	width:			100%;
+	font-size:		110%;
+	border-radius:		7px;
+	-moz-border-radius:	7px;
+}
+input.term {
+	sbackground-image:	url(input-bg.png);
+}
+textarea.term {
+	sbackground-image:	url(textarea-bg.png);
+	position:		relative;
+	top:			-1px;
+}
+input.term:active,
+textarea.term:active {
+	border-color:		rgb(50,50,50);
+}
+#more-input, #less-input {
+	overflow:		hidden;
+}
+#more-input input {
+	float:			right;
+}
+form {
+	margin-bottom:		1em;
+}
+#more-input-btn {
+	display:		block;
+	position:		absolute;
+	top:			0;
+	right:			-1.2em;
+	width:			0.9em;
+	height:			1.55em;
+	line-height:		1.3em;
+	text-decoration:	none;
+	background:		rgb(240,240,240);
+	border:			2px solid rgb(105,105,105);
+	color:			black;
+	text-align:		center;
+	font-family:		"Times new Roman",serif;
+	font-size:		110%;
+	border-radius:		7px;
+	-moz-border-radius:	7px;
+}
+#more-input-btn:hover,
+input[type=submit]:hover {
+	background:		rgb(80,177,42);
+	border:			2px solid rgb(50,50,50);
+	color:			white;
+}
+input[type=submit] {
+	background:		rgb(240,240,240);
+	border:			2px solid rgb(105,105,105);
+	color:			black;
+	padding:		.2em 1em .2em 1em;
+	border-radius:		7px;
+	-moz-border-radius:	7px;
+}
+
+/* ================================================================== Output */
+
+#answer {
+	padding:		1em;
+	padding-left:		80px;
+	margin-bottom:		1em;
+	overflow:		hidden;
+	position:		relative;
+	border-width:		2px;
+	border-style:		solid;
+	border-radius:		7px;
+	-moz-border-radius:	7px;
+	background-position:	15px 18px;
+	background-repeat:	no-repeat;
+	min-height:		105px;
+}
+#answer.none {
+	border-color:		transparent;
+	background-color:	rgb(240,240,240);
+	border-color:		rgb(165,165,165);
+	min-height:		0;
+	padding:		2em;
+	text-align:		center;
+	color:			rgb(50,50,50);
+}
+#answer.none a {
+	color:			rgb(50,50,50);
+}
+#answer.working {
+	background-color:	rgb(210,230,255);
+	background-image:	url(throbber.gif);
+	background-position:	1em 50%;
+	padding-left:		3em;
+	border-color:		rgb(100,140,185);
+}
+#answer.true {
+	background-color:	rgb(230,255,210);
+	background-image:	url(true.png);
+	border-color:		rgb(80,185,50);
+}
+#answer.true .truth {
+	color:			rgb(60,185,40);
+}
+#answer.false {
+	background-color:	rgb(255,210,220);
+	background-image:	url(false.png);
+	border-color:		rgb(185,50,70);
+}
+#answer.false .truth {
+	color:			rgb(185,30,40);
+}
+#answer.error {
+	background-color:	rgb(255,245,180);
+	background-image:	url(error.png);
+	border-color:		rgb(195,165,50);
+	font-size:		120%;
+}
+#answer h2 {
+	margin-top:		-.2em;
+}
+
+#answer .truth {
+	position:		absolute;
+	top:			62px;
+	left:			10px;
+	width:			60px;
+	text-align:		center;
+	font-family:		sans-serif;
+	font-weight:		bold;
+	font-variant:		small-caps;
+	font-size:		130%;
+}
+#answer .term {
+	font-size:		120%;
+	line-height:		130%;
+}
+
+/* ----------------------------------------- Counter models */
+
+.model {
+	background:		white;
+	border:			1px solid rgb(185,50,60);
+	float:			right;
+	margin-left:		.5em;
+	position:		relative;
+}
+.model .node {
+	position:		absolute;
+	display:		none;
+}
+
+/* ----------------------------------------- Error messages */
+
+.error h2 {
+	font-size:		120%;
+}
+.error ul {
+	font-family:		"Times new Roman", serif;
+	list-style:		none;
+	margin:			0;
+	padding:		0;
+}
+.bad {
+	color:			black;
+	background:		red;
+	white-space:		pre;
+}
+.more-bad {
+	color:			red;
+}
+
+/* ================================================================== Terms */
+
+.term, .math {
+	font-family:		"Times new Roman", serif;
+	font-size:		105%;
+	font-style:		italic;
+	text-decoration:	none;
+}
+.term .sym {
+	color:			rgb(60,40,0);
+}
+.sym, .par, .greek, .box {
+	font-family:		"Times new Roman", "OpenSymbol" "Arial Unicode MS", serif;
+	font-style:		normal;
+}
+.kw {
+	font-family:		typewriter;
+	font-style:		normal;
+	font-variant:		small-caps;
+	color:			rgb(60,40,0);
+}
+.ksym {
+	font-style:		normal;
+	color:			rgb(60,0,30);
+}
+.ksym sub, .agent {
+	font-family:		typewriter;
+	font-style:		normal;
+	font-variant:		small-caps;
+	color:			black;
+}
+.ksym sup {
+	font-family:		typewriter;
+	font-style:		normal;
+	position:		relative;
+	top:			.4ex;
+	left:			.1ex;
+}
+.ksym sup + sub {
+	margin-left:		-1ex;
+}
+.box {
+	font-size:		130%;
+}
+.math sub {
+	position:		relative;
+	top:			2px;
+}
+.math .box {
+	position:		relative;
+}
+.math .strike {
+	position:		absolute;
+	top:			.5ex;
+	left:			.03ex;
+}
+.sf {
+	font-family:		sans-serif;
+	font-style:		normal;
+}
+
+.comment {
+	color:			rgb(80,80,80);
+	font-style:		italic;
+	font-family:		"Century Gothic", sans-serif;
+	font-size:		90%;
+}
+.old {
+	color:			rgb(118,112,106);
+}
+.new {
+	color:			rgb(0,26,179);
+}
+.keyword {
+	color:			rgb(20,100,0);
+}
+.keyglyph {
+	color:			rgb(20,100,0);
+}
+.conid {
+	color:			rgb(0,0,40);
+}
+.varop {
+	color:			rgb(100,30,0);
+}
+
+/* ----- Nesting highlighting */
+
+div [class=nest]:hover {
+	background:		rgb(200,230,255);
+	border:			1px solid rgb(100,140,185);
+	margin-left:		-1px;
+	margin-right:		-1px;
+}
+div [class=nest]:hover > .par {
+	background:		rgb(140,192,255);
+}
+div [class=nest]:hover > .nest > .sym,
+div [class=nest]:hover > .nest > .ksym {
+	background:		rgb(180,220,255);
+}
+div [class=nest]:hover > .sym,
+div [class=nest]:hover > .ksym,
+div [class=nest]:hover > .kw {
+	background:		rgb(128,182,255);
+	border-right:		1px solid rgb(100,140,185);
+	margin-right:		-1px;
+}
+div [class=nest]:hover > .nest + .sym {
+	border-left:		1px solid rgb(100,140,185);
+	margin-left:		-1px;
+}
+div [class=nest]:hover > .nest > .par {
+	background:		rgb(160,210,255);
+}
+
+/* ================================================================== Text markup */
+
+h2 {
+	font-family:		"century gothic", sans-serif;
+	font-weight:		normal;
+	font-size:		170%;
+	margin:			0;
+	margin-bottom:		.2em;
+	margin-top:		.8em;
+}
+h2:first-child {
+	margin-top:		0;
+}
+h3 {
+	margin:			0;
+	margin-top:		1em;
+	margin-bottom:		.5em;
+	font-family:		sans-serif;
+	font-weight:		normal;
+	font-size:		120%;
+}
+h2 + h3 {
+	margin-top:		.8em;
+}
+p {
+	margin-top:		.8em;
+	margin-bottom:		0;
+}
+h3 + p {
+	margin-top:		0;
+}
+#main p {
+	line-height:		130%;
+	margin-top:		.8em;
+	margin-bottom:		0;
+	text-align:		justify;
+}
+#main ul, #main ol {
+	line-height:		130%;
+	margin-top:		.3em;
+	margin-bottom:		0;
+}
+#main li ul, #main li ol {
+	margin-top:		0;
+}
+#main li {
+	margin-bottom:		.2em;
+}
+#main h2 + ul {
+	margin-top:		.6em;
+}
+
+/* tables */
+p + table, ul + table, ol + table {
+	margin-top:		.8em;
+}
+h2 + table {
+	margin-top:		.4em;
+}
+table {
+	border-collapse:	collapse;
+}
+td, th {
+	border:			1px solid rgb(190,190,190);
+	padding:		2px;
+	padding-left:		3px;
+	text-align:		left;
+}
+th {
+	vertical-align:		top;
+	border:			1px solid rgb(150,150,150);
+	background:		rgb(100,100,100);
+	color:			white;
+	font-weight:		normal;
+	font-family:		sans-serif;
+}
+th[colspan] {
+	text-align:		center;
+}
+thead {
+	border-bottom:		2px solid rgb(50,50,50);
+}
+.term {
+	background:		rgb(240,240,240);
+}
+#answer .term {
+	background:		transparent;
+}
+/* syntax reference */
+td .term {
+	margin-left:		.2em;
+}
+td .term:first-child {
+	margin-left:		0;
+}
+#main .moltap {
+	font-family:		"century gothic", sans-serif;
+	font-size:		95%;
+	letter-spacing:		-.12ex;
+}
+/* links */
+a {
+	color:			rgb(64,154,39);
+}
+a:visited {
+	color:			rgb(54,104,20);
+}
+a:hover {
+	color:			rgb(39,64,154);
+}
+a.term {
+	border:			1px solid rgb(200,200,200);
+	padding:		1px;
+	color:			rgb(20,60,0);
+	background:		transparent;
+}
+a.term:hover {
+	border:			1px solid rgb(100,100,100);
+	background:		rgb(240,240,240);
+	color:			rgb(0,0,0);
+}
+a.term .sym, a.term .ksym, a.term .kw, a.term sub {
+	color:			inherit;
+}
+a:active, a.term:active {
+	color:			red;
+}
+a.continue {
+	display:		block;
+	text-align:		right;
+}
+/* images */
+.latex, .graph, .screenshot {
+	display:		block;
+	margin-left:		1em;
+	margin-top:		.5em;
+}
+/* Example sessions */
+
+pre {
+	border-left:		5px solid rgb(200,200,200);
+	margin-top:		.8em;
+	margin-bottom:		0;
+	margin-left:		.5em;
+	padding-left:		5px;
+}
+
+.prompt {
+	font-weight:		bold;
+	color:			rgb(80,80,80);
+}
+.output {
+	color:			rgb(0,128,0);
+	margin-bottom:		3px;
+}
+.algo {
+	margin-left:		1em;
+	margin-top:		.8em;
+}
+.algo .name {
+	margin-left:		-1em;
+}
+#main .algo p {
+	margin-top:		.1em;
+}
+#main .algo ol {
+	margin-left:		2em;
+	padding-left:		0;
+}
+
+/* Todo */
+.TODO {
+	color:			red;
+	font-size:		120%;
+	margin:			.5em;
+}
+
+/* Anchor highlighting */
+h2.highlight {
+	background:		rgb(80,177,42) url(header-bg.png) left bottom;
+	padding:		.2em;
+	margin:			.8em -.2em .3em -.2em;
+	color:			white;
+}
+h3.highlight {
+	/*background:		rgb(50,50,50);*/
+	background:		rgb(80,177,42) url(header-bg.png) left bottom;
+	padding:		.2em;
+	margin:			.8em -.2em .3em -.2em;
+	color:			white;
+}
+li div {
+	padding:		2px;
+	margin:			-2px;
+}
+div.highlight {
+	background:		rgb(80,177,42) url(header-bg.png) left bottom;
+	color:			white;
+}
+#main .highlight a {
+	color:			white;
+}

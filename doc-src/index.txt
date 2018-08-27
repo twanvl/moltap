@@ -1,0 +1,53 @@
+
+
+-- About --
+
+MOLTAP is a Modal Logic Tableau Prover, an automated theorem prover for modal logic (in particular for epistemic logic).
+This program was developed for the <a href="http://ai.rug.nl/mas">Multi Agent Systems course</a>.
+MOLTAP was inspired by <a href="references.html#oops">OOPS</a>, a similar proof system from a previous year.
+% TODO: MEER
+
+-- Quick links --
+
+* <a href="prover.html">Go to the prover</a>
+* <a href="users-guide.html">Users guide</a>
+* <a href="download.html">Download the prover</a>
+* <a href="theory.html">Theory behind the prover</a>
+* <a href="implementation.html">Implementation of the prover</a>
+
+-- Goals --
+
+The goals for the MOLTAP project are
+
+* Create a convenient system for proving formulas in epistemic and other modal logics.
+.. In particular, this means
+.. <ul>
+.. <li> The syntax should be user friendly, and correspond directly to the formal notation.
+.. <li> Include notation for writing more complicated formulas, such as the <a href="syntax.html#advanced-features">let syntax</a>.
+.. </ul>
+* The system should generate counter models for false formulas and proofs for true formulas.
+.. This will help convince the user of the tool's correctness by allowing manual verification.
+.. In addition, proofs and counter examples could be used for educational purposes independent of the program.
+* Include a correctness proof for the system.
+.. The formal description should correspond closely to the actual implementation.
+* Support additional modal operators beyond $\BB$/$\DD$, with the focus on epistemic logic.
+.. In this regard the <a href="common-knowledge.html">common knowledge operator</a> is the most important,
+.. because common knowledge greatly simplifies the modeling of real world situations.
+
+There exist <a href="references.html#other-modal-tableau-systems">several other</a>
+modal tableau provers, most of these have a different focus.
+
+-- Known problems --
+
+At the present time there are still some problems with MOLTAP:
+
+# $K$ and $\BB$ are used interchangeably throughout this paper. I should be more consistent.
+# The common knowledge operator can lead to infinite loops.
+# Common knowledge is not implemented correctly (there is no rule for $K^*\phi\Pos$).
+# The 4 and 5 rules for group knowledge are currently incorrect,
+.. for example the prover will claim that [[EX: K_{1,2} x -> K_{1,2} K_{1,2} x]] is true,
+.. which should not be the case.
+.. The expanded form [[EX: (K_1 x & K_2 x) -> K_1 (K_1 x & K_2 x) & K_2 (K_1 x & K_2 x)]] is indeed not valid.
+# The program still contains much experimental and debug code, a lot of which is not used.
+.. As a result building the source code will give many warning messages.
+

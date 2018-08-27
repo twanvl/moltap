@@ -1,0 +1,55 @@
+Related work
+
+-- Other modal tableau systems --
+
+There are several other programs provers for modal formula, many of which are also based on tableau reasoning.
+
+The Object Oriented Prover for S5<sub>n</sub>, <a href="references.html#oops">OOPS</a> is a modal prover written in Java.
+OOPS is uses a design with a flexible rule engine, the rule are specified as objects and can be changed at runtime.
+The price of this flexibility is that OOPS can be very slow, taking several minutes for formulas such as those from the <a href="examples.html">three hats example</a>.
+
+<a href="references.html#freevar">ModLeanTAP</a> is another implementation of modal tableaux, written in Prolog.
+This prover is very compact, measuring just under 10kB.
+The source code is set up to correspond closely to the accompanying paper, which also gives correctness proofs.
+
+A disdvantage of both of these provers is the lack of a good user interface.
+OOPS requires formulas to be entered on the command line in a non-standard syntax.
+There is no option to load input from a file.
+ModLeanTAP does not include a user interface at all, it is just a decision procedure callable from other Prolog code.
+
+<a href="references.html#lwb">The Logics Workbench</a> also includes support for modal logic,
+among various other logical systems.
+It has a more evolved user interface compared to the other two systems mentioned above.
+Unfortunately this program is no longer maintained.
+
+--- Labeled tableaux ---
+
+Both OOPS and ModLeanTAP use ''labeled tableaux'', in this system each formula is labled with the world it is in.
+For example what we would write as $[\phi\Pos,\psi\Pos]_i$ is written as 
+FORMULA: labled1
+  0.1_i. \phi\\
+  0.1_i. \psi
+In these systems. 0 is the label of the root world, while $1_i$ is another world reachable by agent i.
+Multiple formulas are grouped together by these labels.
+So the above tableau should be read as &ldquo;In all worlds '1' reachable from world '0' by agent $i$, either $\phi$ holds or $\psi$ holds&rdquo;
+%A disadvantage of these systems is the need for labels, 
+
+OOPS uses Java objects for the labels, which are essentially unique identifiers.
+With unique identifiers care must be taken to not create multiple worlds for the same formula.
+In OOPS that problem is solved by maintaining a list of formulas for which a world has been created.
+
+ModLeanTAP uses a slightly different approach,
+where the world created for a formula $\BB_i \phi$ is labled by the formula itself.
+This also solves the problem of duplicating work.
+%The associated paper <a href="references.html#freevar">Free variable tableaux for propositional modal logic</a> refers to this
+
+In labeled tableau proofs it is also possible to create worlds for negatively occurring boxes ($\BB_i \phi\Neg$).
+These formulas are then labeled with a ''variable'', which is later unified with a ''ground'' label from a normal positive box.
+An advantage of this approach is that formulas inside a negative box can also be expanded, allowing them to be inspected only once.
+In our system a formula like $\phi$ above will be copied for each world, and can therefore be inspected multiple times.
+
+These variable labels also come with disadvantages.
+In non-serial models something like $0.x. \phi, 0.x. \neg\phi$ is ''not'' an axiom, because there may not exist a world matching $x$.
+Another disadvantage is that working with variables requires complex machinery such as unifications.
+For ModLeanTAP this is not a problem, since it is written in Prolog these come for free.
+OOPS does not in fact use variable labels, instead it uses a table of necessities, just like our prover.

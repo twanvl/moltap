@@ -1,0 +1,107 @@
+Theory behind the program
+
+-- Syntax & semantics --
+
+Before going any further, let us first get the syntax and semantics out of the way.
+We use the standard syntax and Kripke semantics, so readers familiar with these can skip this section.
+This section is only used for later reference.
+The notation is based on the book Epistemic Logic for AI and Computer Science <a href="references.html#epistemic">(van der Hoek and Ch. Meyer)</a>
+
+Propositional variables are $p$, $q$, ... $\in \n{Pr}$.
+Agent names are $i$, $j$, ... $\in \n{Ag}$.
+Formulas $\phi$, $\psi$, ... are then given by the grammar
+FORMULA: syntax
+  p,q,\dotsc       & \in \n{Pr} \\
+  i,j,\dotsc       & \in \n{Ag} \\
+  \phi,\psi,\dotsc & ::= \top  \mid \bot \mid  p  \mid  \neg \phi  \mid  \phi \et \psi  \mid  \phi \vee \psi  \mid   \phi \imp \psi  \mid  K_i \phi  \mid  M_i \phi
+
+As usual the semantics is given by Kripke models.
+A Kripke model $M=\tup{S,R,V}$ is a triple of states, accessibility relations (one for each agent) and a valuation function.
+The semantics of a formula in a particular modal and world, written as $M,s \models \phi$ is defined as
+
+FORMULA: semantics
+  \begin{array}{lcl}
+  M,s \models \top            &\EQ&  \True \\
+  M,s \models \bot            &\EQ&  \False \\
+  M,s \models p               &\EQ&  p\in V(w)\\
+  M,s \models \neg \phi       &\EQ&  M,s \not\models \phi\\
+  M,s \models \phi \et \psi   &\EQ&  (M,s \models \phi) \et  (M,s \models \psi)\\
+  M,s \models \phi \vee \psi  &\EQ&  (M,s \models \phi) \vee (M,s \models \psi)\\
+  M,s \models \phi \imp \psi  &\EQ&  (M,s \models \phi) \Imp (M,s \models \psi)\\
+  M,s \models \BB_i \phi      &\EQ&  \forall t\; sR_it \Imp M,t \models \phi\\
+  M,s \models \DD_i \phi      &\EQ&  \exists t\; sR_it \et M,t \models \phi
+  \end{array}
+
+We say that a formula is ''valid'' (notatation: $\models \phi$), when $M,s \models \phi$ for all models $M$ and all worlds $s$ in that model.
+
+-- Tableau proofs --
+
+Given any formula $\phi$ we would like to be able to show that either $\phi$ is true in all models,
+or that there is a model in which $\phi$ does not hold. In other words, whether $\models\phi$ or $\not\models\phi$.
+This is impossible using just the semantics from the previous paragraph; instead we need a ''proof system''.
+The proof system will give rules for the relation $\T \phi$.
+By showing that the system is sound and complete we know that $\models \phi \Eq \T \phi$.
+And hence for all valid formulas there is a derivation in the system while for invalid formulas there is none.
+Because there is only a small number of rules we can exhaustively ''search'' for a proof starting from the conclusion (the formula we wish to proof).
+
+As the abbreviation suggests MOLTAP is based on semantic tableaux.
+In the usual presentation of tablau reasoning to prove/disprove a formula $\phi$
+you assume $\neg\phi$, and write down all the consequences of that.
+If you reach a contradiction $\neg\phi$ can not be true, so $\phi$ must be true.
+If no contradiction is reached then $\neg\phi$ ''can'' be true, and hence $\phi$ is not always true.
+
+In this paper we take a slightly different approach, which is closer to normal proof systems.
+In particular, we use a sequent calculus (also called a Gentzen system).
+See for instance the book Basic Proof Theory for an introduction <a href="references.html#basic-proof-theory">(Troelstra and Schwichtenberg)</a>.
+A big advantage of sequent calculi is that the whole ''context'' of assumptions is always carried around.
+This means that all proof steps can be local, there are no references to other parts of the proof.
+
+Usually sequents are written &lsquo;two sided&rsquo;, $\phi_1,\phi_2 \T \psi_1,\psi_2$, which stands for $(\phi_1 \et \phi_2) \imp (\psi_2 \vee \psi_2)$.
+Following Burchardt et al we use signed formulas instead <a href="references.html#tab-calc">(Burchardt et al)</a>.
+This means we will write ${\phi_1^-,\phi_2^-,\psi_1^+,\psi_2^+}$ for the equivalent formula $\neg\phi_1 \vee \neg\phi_2 \vee \psi_2 \vee \psi_2$.
+
+'''Definition''' A ''signed formula'' is either $\phi\Pos$ or $\phi\Neg$.
+* $\Pos$ stands for a ''positive occurrence'', a goal. Proving $\phi\Pos$ is equivalent to just proving $\phi$.
+* $\Neg$, on the other hand, stands for a ''negative occurrence'', an assumption.
+.. To proof $\phi\Neg$ it must be shown that $\phi$ ''does not'' hold.
+.. The reason for calling this an &ldquo;assumption&rdquo; is explained below.
+The semantics of signed formulas is therefore simple.
+We extend the $\models$ relation slightly:
+FORMULA: semantics-signed
+  \begin{array}{lcl}
+  M,s \models \phi\Pos    &\EQ&  M,s \models \phi\\
+  M,s \models \phi\Neg    &\EQ&  M,s \not\models \phi\\
+  \end{array}
+
+'''Definition:'''
+A ''sequent'' is a finite set of these signed formulas.
+Semantically a sequent is a disjunction; it is true if one of the formulas in the set is true.
+FORMULA: semantics-sequent
+  \begin{array}{lcl}
+  M,s \models \G   &\EQ&   \exists \g\in\G\; M,s \models \g\\
+  \end{array}
+We will use Greek capital letters $\G,\D,\E$ for sequents.
+When there is no ambiguity we drop the braces around sequents, and we write $\Gamma,\phi^\pm$ for $\Gamma\cup{\phi^\pm}$.
+%In other proof systems sequents are often written two sided, $\phi \T \psi$, instead we use the notation $\T \phi\Neg, \psi\Pos$.
+
+The terminology of goal and assumption for positive and negative formulas comes from the implication operator.
+The formula $\phi \imp \psi$ can be read as &ldquo;If $\phi$ then $\psi$&rdquo; or &ldquo;Assuming $\phi$ it holds that $\psi$&rdquo;.
+Because a sequent is a disjunction the above formula could be written as ${\neg\phi, \psi}$.
+Or using signed formulas as ${\phi\Neg, \psi\Pos}$.
+
+The search for a proof always begins with a single goal, $\phi\Pos$.
+This goal forms a sequent, or in different terminology the contents of a tableau.
+Later on more things will be added to the sequent.
+For example if $\phi=\psi\vee\chi$ then the sequent can be extended to ${\psi\vee\chi\Pos, \psi\Pos, \chi\Pos}$.
+
+%This goal forms a sequent the tableau, later on more things will be added.
+%For example if $\phi=\psi\vee\chi$ then the tableau can be extended to $\psi\vee\chi\Pos, \psi\Pos, \chi\Pos$.
+%In the terminology of Gentzen style proof systems we call this tableau a sequent.
+
+%So the search for a proof of $\phi$ begins with the sequent $\phi\Pos$.
+%When we want to proof $\phi$ it is a ''goal'', written $\phi\Pos$.
+%On the other hand when $\phi$ is ''assumed'' it is written as $\phi\Neg$.
+%We call these ''signed formulas''.
+
+
+[[CONT: tableaux-propositional.html|Tableau system for propositional logic]]

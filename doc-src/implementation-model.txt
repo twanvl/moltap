@@ -1,0 +1,34 @@
+Implementing models
+
+-- Data type --
+
+For representing models we use a fairly straightforward record.
+This record will contain three things:
+* The valuation for each world.
+* The relations for each agent.
+* The name of the &lsquo;root&rsquo; world, for counter models this is the world in which the formula will not hold.
+
+In Haskell the data type for models is
+> data Model world = Model
+>     { modValuation :: Map world (Map VarName Bool)
+>     , modRelations :: Map Agents (Relation world)
+>     , modRoot      :: world 
+>     }
+
+Using this model data type we can also define a @@|=@@ function, corresponding to the semantics of Kripke models.
+
+-- Rendering --
+
+To show models to the user we use the <a href="http://graphviz.org">GraphViz</a> program.
+This program takes as input a text file describing a graph, and outputs an image.
+
+To be able to highlight the worlds in which each subformula is true/false we need some extra information.
+First of all we need to know the coordinates of each world in the image.
+GraphViz can provide this in the form of an image map.
+Secondly we need to know in which worlds a formula is actually true.
+This is straight forward, since we have already implemented the @@|=@@ function.
+All that is left is to walk over the syntax tree and annotate each subformula with a note specifying in what worlds it is true.
+
+The rendering of the highlight is done by Javascript code.
+Two images, one of a red circle and one of a green circle, are positioned on top of the graph.
+Whenever the mouse moves over a subformula the note of that formula is read, and the corresponding images are shown or hidden.
