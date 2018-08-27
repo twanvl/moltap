@@ -1,0 +1,104 @@
+name:                  Moltap
+version:               0.2
+cabal-version:         >= 1.2
+build-type:            Simple
+license:               GPL
+license-file:          LICENSE
+maintainer:            Twan van Laarhoven
+author:                Twan van Laarhoven
+category:              Theorem proving
+synopsis:              MOLTAP - A Modal Logic Tableau Prover
+description:
+    MOLTAP - A Modal Logic Tableau Prover
+
+extra-source-files:
+    tools/convert.pl
+    tools/format.pl
+    tools/prelude.tex
+    tools/proof.sty
+    doc-src/template.html
+    doc-src/style/style.css
+    doc-src/style/script.js
+    doc-src/style/jquery.js
+    doc-src/style/textarea-bg.png
+    doc-src/style/throbber.gif
+    doc-src/style/true.png
+    doc-src/style/circle-green.png
+    doc-src/style/circle-red.png
+    doc-src/style/error.png
+    doc-src/style/false.png
+    doc-src/style/header-bg.png
+    doc-src/style/input-bg.png
+    doc-src/index.txt
+    doc-src/prover.txt
+    doc-src/examples.txt
+    doc-src/syntax.txt
+    doc-src/users-guide.txt
+    doc-src/download.txt
+    src/Moltap/CGI/CGIMain.hs
+    src/Moltap/CGI/HTMLOutput.hs
+
+
+Flag split-base
+Flag include-cgi
+
+Executable moltap-cgi
+    If !flag(include-cgi)
+        Buildable:        False
+    If flag(split-base)
+        build-depends:    base >= 3, containers, process
+    Else
+        build-depends:    base < 3
+    If !os(windows)
+        build-depends:    unix
+        ghc-options:      -DUNIX
+    build-depends:      mtl, parsec, cgi >= 3, utf8-string, filepath
+    main-is:            Moltap/CGI/CGIMain.hs
+    hs-source-dirs:     src
+    ghc-options:        -Wall
+    extensions:         CPP
+    other-modules:
+        Moltap.Util.Util
+        Moltap.Util.TreeZipper
+        Moltap.Util.Graphviz
+        Moltap.Util.SimpleJSON
+        Moltap.Base.Agents
+        Moltap.Base.Syntax
+        Moltap.Base.Parser
+        Moltap.Base.Proof
+        Moltap.Base.Model
+        Moltap.Base.ModelGraphviz
+        Moltap.Prover.SplitStateMonad
+        Moltap.Prover.TableauState
+        Moltap.Prover.Prover
+        Moltap.CGI.CGIMain
+        Moltap.CGI.HTMLOutput
+
+Executable moltap
+    If flag(split-base)
+        build-depends:    base >= 3, containers, process
+    Else
+        build-depends:    base < 3
+    If !os(windows)
+        build-depends:    unix
+        ghc-options:      -DUNIX
+    build-depends:      mtl, parsec, utf8-string, filepath
+    main-is:            Moltap/CLI/CLIMain.hs
+    hs-source-dirs:     src
+    ghc-options:        -Wall
+    extensions:         CPP
+    other-modules:
+        Moltap.Util.Util
+        Moltap.Util.TreeZipper
+        Moltap.Util.Graphviz
+        Moltap.Util.SimpleJSON
+        Moltap.Base.Agents
+        Moltap.Base.Syntax
+        Moltap.Base.Parser
+        Moltap.Base.Proof
+        Moltap.Base.Model
+        Moltap.Base.ModelGraphviz
+        Moltap.Prover.SplitStateMonad
+        Moltap.Prover.TableauState
+        Moltap.Prover.Prover
+        Moltap.CLI.CLIMain
