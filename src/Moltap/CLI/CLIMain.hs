@@ -19,12 +19,9 @@ import Moltap.Prover.Prover
 import Moltap.Util.Graphviz
 
 import Data.Char
-import Control.Exception (catch)
 import System.Console.GetOpt
 import System.Environment
-import System.IO      (hSetBuffering, BufferMode(..), stdout, stderr)
-import System.IO.UTF8 (getContents, readFile, getLine)
-import Prelude hiding (getContents, readFile, getLine, catch)
+import System.IO
 
 --------------------------------------------------------------------------------
 -- Configuration options
@@ -64,13 +61,13 @@ options =
 --------------------------------------------------------------------------------
 
 main :: IO ()
-main = main' `catch` print
-
-main' :: IO ()
-main' = do
+main = do
     args <- getArgs
     hSetBuffering stdout NoBuffering
     hSetBuffering stderr NoBuffering
+    hSetEncoding stdin  utf8
+    hSetEncoding stdout utf8
+    hSetEncoding stderr utf8
     case getOpt (ReturnInOrder $ setInvokation . File) options args of
         (o,[],[]) -> let Opt invokeType modelFile = foldr ($) defaultProgramOpt o
                      in case invokeType of
@@ -88,13 +85,13 @@ run :: FilePath -> String -> String -> IO ()
 run modelFile inputName input =
     case tryParseNamed inputName input of
        Left e     -> putStrLn $ show e
-       Right prog -> case proof prog of
+       Right prog -> case prove prog of
            Left   _prf -> do
                putStrLn "true"
            Right model -> do
                putStrLn "false"
                -- Render the model with graphviz
-               runGraphviz Neato modelFile $ modelToDot model
+               runGraphviz_ Neato modelFile $ modelToDot model
                return ()
 
 runInteractive :: FilePath -> IO ()

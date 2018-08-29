@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeSynonymInstances, PatternGuards #-}
+{-# LANGUAGE TypeSynonymInstances, PatternGuards, FlexibleInstances #-}
 
 module Moltap.Base.Proof
    ( -- * Proofs
@@ -20,16 +20,12 @@ module Moltap.Base.Proof
 
 import qualified Data.Set as Set
 import Data.Set (Set)
-import Control.Monad.Error
-import Data.Monoid
 import Data.List
 import Data.Maybe
 
 import Moltap.Base.Syntax
 import Moltap.Base.Agents
 import Moltap.Util.Util
-
-import Debug.Trace
 
 --------------------------------------------------------------------------------
 -- Proof trees

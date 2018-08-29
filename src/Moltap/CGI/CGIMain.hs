@@ -17,14 +17,12 @@ module Main (main) where
 import Moltap.Base.Parser
 import Moltap.Base.Model
 import Moltap.Base.ModelGraphviz
+import Moltap.Base.HTMLOutput
 import Moltap.Prover.Prover
-import Moltap.CGI.HTMLOutput
 import Moltap.Util.SimpleJSON
 import Moltap.Util.Graphviz
 import Moltap.Util.Util
 
-import Data.List
-import Control.Monad
 import Control.Exception
 
 import Network.CGI
@@ -86,7 +84,7 @@ jsonMain = do
        Left e     -> errorIO $ showAsHTML e
        Right term -> do
          result <- timeoutWith timelimit (errorIO "Time limit exceeded")
-                    $ evaluate (proof term)
+                    $ evaluate (prove term)
          case result of
            Left   _prf -> do
                -- The term is true, just return it

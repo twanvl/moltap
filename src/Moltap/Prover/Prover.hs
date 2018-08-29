@@ -1,12 +1,10 @@
 
 module Moltap.Prover.Prover
-    ( proof
+    ( prove
     ) where
 
 import qualified Data.Map as Map
-import Control.Monad
 
-import Data.List
 import Moltap.Base.Syntax
 import Moltap.Base.Agents
 import Moltap.Base.Proof
@@ -17,13 +15,13 @@ import Moltap.Prover.TableauState
 -- High level interface
 --------------------------------------------------------------------------------
 
--- | Proof a formula or find a counter model
-proof :: Program -> Either Proof CounterModel
-proof = uncurry proofFormula . evalProgram
+-- | Prove a formula or find a counter model
+prove :: Program -> Either Proof CounterModel
+prove = uncurry proveFormula . evalProgram
 
--- | Proof a formula or find a counter model
-proofFormula :: Axioms -> Formula -> Either Proof CounterModel
-proofFormula ax f = case execSSM (emptyTableauState ax) (tableaux f (True :+ emptyHP)) of
+-- | Prove a formula or find a counter model
+proveFormula :: Axioms -> Formula -> Either Proof CounterModel
+proveFormula ax f = case execSSM (emptyTableauState ax) (tableaux f (True :+ emptyHP)) of
             Left  prf -> Left $ simplifyProof prf
             Right tab -> Right $ simplifyModel (|/= f)
                                $ axiomaticClosure (agents f) ax

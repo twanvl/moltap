@@ -15,12 +15,12 @@
 module Moltap.Util.Graphviz
     ( GraphvizProgram(..)
     , NodePosition(..)
-    , runGraphviz
+    , runGraphviz, runGraphviz_
     ) where
 
+import Control.Monad
 import Control.Exception
-import System.IO.UTF8 (hPutStr)
-import System.IO      (hGetContents, hClose)
+import System.IO
 import System.Process
 import System.FilePath
 
@@ -68,14 +68,18 @@ runGraphviz :: GraphvizProgram -> FilePath -> String -> IO [NodePosition]
 runGraphviz prog filename graph = do
     (i,o,_e,proc) <- runInteractiveProcess (show prog)
                       [extToType filename, "-Timap", "-o", filename] Nothing Nothing
+    hSetEncoding i utf8
     hPutStr i ("digraph G{dpi=80;\n" ++ graph ++ "\n}")
     hClose  i
     out <- hGetContents o
     let positions = parseNodePositions out
-    evaluate (length positions) -- force
-    waitForProcess proc
+    _ <- evaluate (length positions) -- force
+    _ <- waitForProcess proc
     makeFileReadable filename
     return positions
+
+runGraphviz_ :: GraphvizProgram -> FilePath -> String -> IO ()
+runGraphviz_ prog filename graph = void (runGraphviz prog filename graph)
 
 -- | Type to use for graphiviz invokation, based on output filename
 extToType :: FilePath -> String

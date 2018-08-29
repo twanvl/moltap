@@ -40,8 +40,6 @@ import qualified Moltap.Util.TreeZipper as Z
 
 import qualified Data.Map as Map
 import Data.Map (Map)
-import Control.Monad
-import Data.Monoid
 
 --------------------------------------------------------------------------------
 -- The tableau/sequent state type

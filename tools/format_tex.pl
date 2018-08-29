@@ -110,8 +110,8 @@ sub my_format_term {
   s@(\\(amp|et|vee|neg|imp|pmi|eq|neq|not\\eq|top|bot|phi|psi|chi|alpha|beta|BB|DD))@\\ensuremath{$1}@g;
   s@(?<!&)(\\\#.*)@\\termcomment{$1}@g;
   s@\b(?<![\\])(let|true|false|and|or|implies|not|system)@\\keyword{$1}@g;
-  s@((?:[KM]|\\ensuremath{\\[BD][BD]}|\[\]|\<\>)[*]?)\\_((\w|[{},\\])*)@$1\\agents{$2}@g;
-  s@((?:[KM]|\\ensuremath{\\[BD][BD]}|\[\]|\<\>)[*]?)\\_\\_(?!<)(\w*)@$1\\_\\agents{$2}@g;
+  s@((?:[KM]|\\ensuremath\{\\[BD][BD]}|\[\]|\<\>)[*]?)\\_((\w|[{},\\])*)@$1\\agents{$2}@g;
+  s@((?:[KM]|\\ensuremath\{\\[BD][BD]}|\[\]|\<\>)[*]?)\\_\\_(?!<)(\w*)@$1\\_\\agents{$2}@g;
   return my_unmeddle($_);
 }
 sub my_format_term_simple {
@@ -226,10 +226,10 @@ sub format {
   #s|^] (.*)|"\\begin{lstlisting}\n".my_format_pre($1)."\n\\end{lstlisting}"|mge;
   #s|\n\\end{lstlisting}\n\\begin{lstlisting}\n|\n|g;
   s|^] (.*)|"\\begin{code}\\texttt{".my_format_pre($1)."}\\\\\\end{code}"|mge;
-  s|\\end{code}\n\\begin{code}|\n|g;
-  s|\\\\(\\end{code})|$1|g;
-  s|\\begin{code}|\\fbox{\\parbox{15cm}{|g;
-  s|\\end{code}|}}|g;
+  s|\\end\{code\}\n\\begin\{code\}|\n|g;
+  s|\\\\(\\end\{code\})|$1|g;
+  s|\\begin\{code\}|\\fbox{\\parbox{15cm}{|g;
+  s|\\end\{code\}|}}|g;
   
   # per line
   s|(?<!~)@([^@]+)@|"\\term{".my_format_term($1)."}"|ge;
@@ -241,16 +241,16 @@ sub format {
   # lists
   s|^\*(.*)|\\begin{itemize}\\item $1\\end{itemize}|mg;
   s|^\#(.*)|\\begin{enumerate}\\item $1\\end{enumerate}|mg;
-  s|\\end{itemize}(\n?)\\begin{itemize}|$1|g;
-  s|\\end{enumerate}(\n?)\\begin{enumerate}|$1|g;
+  s|\\end\{itemize}(\n?)\\begin\{itemize}|$1|g;
+  s|\\end\{enumerate}(\n?)\\begin\{enumerate}|$1|g;
   
   # tables
   s@^([!|].*)@my_format_table_row($1)@mge;
-  s|\\hline\\end{tabular}\n\\begin{tabular}{.*?}\n?|\n|g;
+  s|\\hline\\end\{tabular\}\n\\begin\{tabular\}\{.*?\}\n?|\n|g;
   s|<thead>\\\\\n\\hline<tbody>|\\\\\n\\hline\\hline|g;
   s|<thead>||g;
   s|<tbody>||g;
-  s|(\\begin{tabular}{.*?})\n?\\begin{tabular}{.*?}|$1|g; # manually specify size
+  s|(\\begin\{tabular\}\{.*?\})\n?\\begin\{tabular\}\{.*?\}|$1|g; # manually specify size
   
   # markup
   s|^==(.*)==|\\heading{$1}|mg;
@@ -273,7 +273,7 @@ sub format {
   s|MOLTAP|\\MOLTAP{}|g;
   
   # fix stuff
-  s|(\heading{.*?}\s*)\\\\|$1|g;
+  s|(\heading\{.*?}\s*)\\\\|$1|g;
   
   return $_;
 }

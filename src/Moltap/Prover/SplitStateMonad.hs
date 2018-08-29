@@ -22,9 +22,8 @@ module Moltap.Prover.SplitStateMonad
     , runSSM, evalSSM, execSSM
     ) where
 
-import Control.Monad.Error
+import Control.Monad
 import Control.Applicative
-import Data.Monoid
 
 -- #define TRACING
 
@@ -71,6 +70,10 @@ instance Applicative (SSM s e) where
     Get        a <*> x = Get (\s -> a s <*> x)
     Put      s a <*> x = Put s (a <*> x)
     Trace    m a <*> x = Trace m (a <*> x)
+
+instance Monoid e => Alternative (SSM s e) where
+    empty = Abort mempty
+    (<|>) = Split
 
 instance Monoid e => MonadPlus (SSM s e) where
     mzero = Abort mempty

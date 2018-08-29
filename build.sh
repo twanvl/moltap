@@ -19,7 +19,6 @@ installdir='/i/i/fmf/moltap';
 doc_opts=;
 build_prog=true;
 build_doc=true;
-configure_opts=;
 
 for option in $*; do
   case $option in
@@ -54,9 +53,7 @@ echo
 if [ $build_prog ]; then
   echo Building Haskell program...
 
-  ghc --make Setup.lhs -o Setup
-  test moltap.cabal -nt dist/setup-config  &&  ./Setup configure $configure_opts
-  ./Setup build || exit;
+  cabal configure && cabal build || exit;
 fi
 
 # -----------------------------------------------------------------------

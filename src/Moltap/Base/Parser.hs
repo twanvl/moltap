@@ -21,12 +21,9 @@ import Moltap.Base.Syntax
 import Moltap.Base.Agents
 
 import Text.ParserCombinators.Parsec
-import Text.ParserCombinators.Parsec.Char
 import Text.ParserCombinators.Parsec.Token
 import Text.ParserCombinators.Parsec.Language
 import Text.ParserCombinators.Parsec.Expr
-import Control.Monad.Error
-import Control.Applicative hiding (many,(<|>),optional)
 import Data.Char
 
 --------------------------------------------------------------------------------
@@ -50,10 +47,6 @@ tryParseNamed name xs = parse (parser <* eof) name xs
 -- | Things that can be parsed
 class Parsable a where
     parser :: CharParser () a
-
-instance Applicative (GenParser a b) where
-    (<*>) = ap
-    pure = return
 
 ----------------------------------------------------------------
 -- Parsing

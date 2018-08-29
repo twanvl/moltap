@@ -30,9 +30,7 @@ module Moltap.Util.TreeZipper
 import qualified Data.Sequence as S
 import Data.Sequence (Seq, (><), (<|), ViewL(..), ViewR(..))
 import qualified Data.Foldable as F
-import Data.Traversable hiding (mapAccumL)
 import Data.List
-import Control.Applicative
 
 #ifdef TEST
 import Test.QuickCheck

@@ -193,5 +193,5 @@ simplifyModel pred mod = trySimplify [ (a,b) | (a:bs) <- tails (modWorlds mod), 
 --   Sets can be unified if they contain the same values for all variables they share
 unifyVars :: Map VarName Bool -> Map VarName Bool -> Maybe (Map VarName Bool)
 unifyVars a b
- | Map.fold (&&) True (Map.intersectionWith (==) a b)  =  Just $ Map.union a b
- | otherwise                                           =  fail "variable sets don't unify"
+ | Map.foldr (&&) True (Map.intersectionWith (==) a b)  =  Just $ Map.union a b
+ | otherwise                                            =  fail "variable sets don't unify"

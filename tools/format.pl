@@ -146,9 +146,9 @@ sub my_tex_to_html {
   s@\\Pos@^+@g;
   s@\\Neg@^-@g;
   if ($subscript) {
-    s@_{(.*?)}@<sub>$1</sub>@g;
+    s@_\{(.*?)}@<sub>$1</sub>@g;
     s@_([^\\]|\\[a-z]+)@<sub>$1</sub>@gi;
-    s@\^{(.*?)}@<sup>$1</sup>@g;
+    s@\^\{(.*?)}@<sup>$1</sup>@g;
     s@\^([^\\]|\\[a-z]+)@<sup>$1</sup>@gi;
   }
   s@\\New[{](.*?)[}]@<span class="new">$1</span>@g;
@@ -190,9 +190,9 @@ sub my_tex_to_html {
   s@\\pm@<span class="sym">&plusmn;</span>@g;
   #s@\\not<span class="(box|sym)">([^<]+)</span>@<span class="$1">$2&#824;</span>@g;
   #s@\\not<span class="(box|sym)">([^<]+)</span>@<span class="$1"><span class="strike">/</span>$2</span>@g;
-  s@\\world{(.*?)}@[$1]@g;
-  s@\\n{(.*?)}@<span class="sf">$1</span>@g;
-  s@\\tup{(.*?)}@&lang;$1&rang;@g;
+  s@\\world\{(.*?)}@[$1]@g;
+  s@\\n\{(.*?)}@<span class="sf">$1</span>@g;
+  s@\\tup\{(.*?)}@&lang;$1&rang;@g;
   s@\\(True|False)\b@<span class="kw">$1</span>@g;
   s@[\[\]\(\)\{\}]|&[lr]ang;@<span class="par">$&</span>@g;
   s@\\;\s*@&nbsp;@g;

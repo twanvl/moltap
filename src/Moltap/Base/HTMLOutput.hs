@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeSynonymInstances #-}
+{-# LANGUAGE TypeSynonymInstances, FlexibleInstances #-}
 {-# OPTIONS_GHC -Wall #-}
 --------------------------------------------------------------------------------
 -- |
@@ -13,7 +13,7 @@
 --
 --------------------------------------------------------------------------------
 
-module Moltap.CGI.HTMLOutput
+module Moltap.Base.HTMLOutput
     ( ShowHTML(..)
     ) where
 
