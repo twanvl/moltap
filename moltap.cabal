@@ -10,6 +10,8 @@ category:              Theorem proving
 synopsis:              MOLTAP - A Modal Logic Tableau Prover
 description:
     MOLTAP - A Modal Logic Tableau Prover
+    Proofs or disproves terms in modal and epistemic logics.
+    Has a command line and a web interface.
 
 extra-source-files:
     tools/convert.pl
@@ -35,8 +37,6 @@ extra-source-files:
     doc-src/syntax.txt
     doc-src/users-guide.txt
     doc-src/download.txt
-    src/Moltap/CGI/CGIMain.hs
-    src/Moltap/CGI/HTMLOutput.hs
 
 
 Library
@@ -51,7 +51,7 @@ Library
     If !os(windows)
         build-depends:      unix
         ghc-options:        -DUNIX
-    hs-source-dirs:     src
+    hs-source-dirs:     src/library
     ghc-options:        -Wall
     extensions:         CPP
     exposed-modules:
@@ -83,7 +83,7 @@ Executable moltap-cgi
         utf8-string,
         moltap
     main-is:            CGIMain.hs
-    hs-source-dirs:     src/Moltap/CGI
+    hs-source-dirs:     src/cgi
     ghc-options:        -Wall -optl-static -optl-pthread
     extensions:         CPP
 
@@ -93,7 +93,7 @@ Executable moltap
         containers,
         moltap
     main-is:            CLIMain.hs
-    hs-source-dirs:     src/Moltap/CLI
+    hs-source-dirs:     src/cli
     ghc-options:        -Wall
     extensions:         CPP
 
