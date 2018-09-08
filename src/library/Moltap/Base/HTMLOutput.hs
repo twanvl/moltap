@@ -26,7 +26,8 @@ import Text.ParserCombinators.Parsec.Error
 import Text.ParserCombinators.Parsec.Pos
 
 import qualified Data.Set as Set
-import Data.List (intersperse)
+import qualified Data.List as List
+import Data.List (intersperse,intercalate,nub)
 import Prelude   hiding (span)
 
 --------------------------------------------------------------------------------
@@ -186,26 +187,41 @@ instance ShowHTML ParseError where
                  ++ ": \"<tt>" ++ escapeInput (reverse . clip 12 . reverse $ before)
                  ++ "<span class='bad'>"      ++ escapeInput after1 ++ "</span>"
                  ++ "<span class='more-bad'>" ++ escapeInput after2 ++ "</span></tt>\""
-          ++ (case escapeInput (showErrorMessages "or" "<li>unknown parse error"
-                                         "<li>expecting" "<li>unexpected" "end of input" (errorMessages e)) of
-                msg@('<':'l':'i':_) -> msg
-                msg                 -> "<li>" ++ msg
-             ) ++
+                 ++ htmlErrorMessages ++
         "</ul>"
       where 
-         pos  = errorPos e
-         col  = sourceColumn pos
-         line = sourceLine   pos
-         (before,after) = splitAtPos pos
-         (after1,after2) = splitAt 1 $ clip 6 after
-         clip n xs = case splitAt n xs of
-                      (a,[]) -> a
-                      (a,_)  -> a ++ "..."
-         escapeInput []         = []
-         escapeInput xs@('"':_) = case reads xs of
+          pos  = errorPos e
+          col  = sourceColumn pos
+          line = sourceLine   pos
+          (before,after) = splitAtPos pos
+          (after1,after2) = splitAt 1 $ clip 6 after
+          escapeInput []         = []
+          escapeInput xs@('"':_) = case reads xs of
                                      [(str,rest)] -> "\"<tt>" ++ showAsHTML (str :: String) ++ "</tt>\"" ++ escapeInput rest
                                      _            -> '"' : escapeInput xs -- fail
-         escapeInput (x:xs)     = x : escapeInput xs
+          escapeInput (x:xs)     = showHTML 0 x $ escapeInput xs
+
+          -- from Text.Parsec.Error.showErrorMessages
+          msgs0 = errorMessages e
+          (sysUnExpect,msgs1) = List.span ((SysUnExpect "") ==) msgs0
+          (unExpect,msgs2)    = List.span ((UnExpect    "") ==) msgs1
+          (expect,messages)   = List.span ((Expect      "") ==) msgs2
+          showExpect      = showMany "Expecting"  expect
+          showUnExpect    = showMany "Unexpected" unExpect
+          showSysUnExpect | not (null unExpect) ||
+                            null sysUnExpect = ""
+                          | null firstMsg    = "Unexpected end of input"
+                          | otherwise        = "Unexpected " ++ firstMsg
+              where
+                  firstMsg  = messageString (head sysUnExpect)
+          showMessages      = showMany "" messages
+          showMany pre msgs = case clean (map (escapeInput . messageString) msgs) of
+                                [] -> ""
+                                ms | null pre  -> commasOr ms
+                                   | otherwise -> pre ++ " " ++ commasOr ms
+          htmlErrorMessages = concat $ map ("\n<li>"++) $ clean $
+                 [showSysUnExpect,showUnExpect,showExpect,showMessages] 
+          clean             = nub . filter (not . null)
 
 --------------------------------------------------------------------------------
 -- Utility
@@ -220,3 +236,15 @@ splitAtPos pos = splitAtPos' (initialPos "") (sourceName pos)
           | sourceLine   pos /= sourceLine   p2 = splitAtPos' (updatePosChar p2 x) xs
           | sourceColumn pos /= sourceColumn p2 = let (before,after) = splitAtPos' (updatePosChar p2 x) xs in (x:before,after)
           | otherwise                           = ([],x:xs)
+
+clip :: Int -> String -> String
+clip n xs = case splitAt n xs of
+             (a,[]) -> a
+             (a,_)  -> a ++ "..."
+
+-- "a, b, c, or d"
+commasOr :: [String] -> String
+commasOr []       = ""
+commasOr [m]      = m
+commasOr ms       = intercalate ", " (init ms) ++ ", or " ++ last ms
+
