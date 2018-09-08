@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 --------------------------------------------------------------------------------
 -- |
 -- Module      :  Moltap.CGI.CGIMain
@@ -19,14 +20,25 @@ import Moltap.Base.Model
 import Moltap.Base.ModelGraphviz
 import Moltap.Base.HTMLOutput
 import Moltap.Prover.Prover
-import Moltap.Util.SimpleJSON
 import Moltap.Util.Graphviz
 import Moltap.Util.Util
 
+import Control.Monad
 import Control.Exception
 
-import Network.CGI
-import Codec.Binary.UTF8.String
+import qualified Data.Text as Text
+import qualified Data.ByteString.Lazy as LBS
+import qualified Data.ByteString.Lazy.Char8 as L8
+import qualified Data.ByteString.Base64 as Base64
+
+import Data.Aeson as JSON hiding (json)
+import Network.Wai
+import Network.Wai.Handler.CGI
+import Network.Wai.Middleware.Gzip
+import Network.Wai.Middleware.Jsonp
+import Network.HTTP.Types.Header
+import Network.HTTP.Types.Status
+import Network.HTTP.Types.URI
 
 --------------------------------------------------------------------------------
 -- Configuration
@@ -39,64 +51,51 @@ timelimit :: Int
 timelimit = 10000000 -- 10 seconds
 
 --------------------------------------------------------------------------------
--- JSON utilities
---------------------------------------------------------------------------------
-
--- | Output Json, optionally with a JsonP callback
-outputJSON :: ToJSON a => a -> CGI CGIResult
-outputJSON value = do
-    callback <- getInput "callback"
-    output $ wrapJsonP callback $ show $ toJSON value
-
--- | Optionally wrap a JsonP callback around a result
-wrapJsonP :: Maybe String -> String -> String
-wrapJsonP Nothing  xs = xs
-wrapJsonP (Just f) xs = f ++ "(" ++ xs ++ ")"
-
--- | Get a parameter, fail if it is not set
-getInputOrFail :: String -> CGI String
-getInputOrFail name = do
-    x <- getInput name
-    case x of
-       Nothing -> errorIO $ "Missing paramter '" ++ name ++ "'"
-       Just  v -> return v
-
---------------------------------------------------------------------------------
 -- CGI main program
 --------------------------------------------------------------------------------
 
 main :: IO ()
-main = runCGI (handleErrors cgiMain)
+main = run $ middleware app
 
-cgiMain :: CGI CGIResult
-cgiMain = do
-    setHeader "Content-Type"   "text/plain"
-    setHeader "Access-Control" "allow <*>"
-    -- Parse and run
-    json <- jsonMain `catchCGI` \e -> return ["result" =: "error", "text" =: show e]
-    -- output the result
-    outputJSON json
+middleware :: Middleware
+middleware = gzip def . jsonp
 
-jsonMain :: CGI [JSONKeyVal]
-jsonMain = do
-    termString <- getInputOrFail "term"
-    liftIO $ case tryParse (decodeString termString) of -- input is utf8 encoded
-       Left e     -> errorIO $ showAsHTML e
-       Right term -> do
-         result <- timeoutWith timelimit (errorIO "Time limit exceeded")
-                    $ evaluate (prove term)
-         case result of
-           Left   _prf -> do
-               -- The term is true, just return it
-               return ["result" =: True
-                      ,"text"   =: showAsHTML term
-                      ]
-           Right model -> do
+app :: Application
+app req respond = do
+    let args = queryToQueryText (queryString req)
+    case join $ lookup "term" args of
+      Nothing -> respondError badRequest400 "Missing parameter 'term'"
+      Just termString -> case tryParse (Text.unpack termString) of
+        Left e     -> respondError badRequest400 $ showAsHTML e
+        Right term -> timeoutWith timelimit (respondError serviceUnavailable503 "Time limit exceeded") $ do
+          result <- evaluate (prove term)
+          case result of
+            Left   _prf -> do
+              -- The term is true, just return it
+              respondJSON ok200 $ JSON.object
+                ["result" .= True
+                ,"text"   .= showAsHTML term
+                ]
+            Right model -> do
                -- Render the model with graphviz
-               let name = modelImageDir ++ toFileName (show term) ++ ".png"
-               positions <- runGraphviz Neato name $ modelToDot model
-               return ["result"    =: False
-                      ,"text"      =: showAsHTML (annotate model term)
-                      ,"modelFile" =: name
-                      ,"modelPos"  =: positions
-                      ]
+              let name = modelImageDir ++ toFileName (show term) ++ ".png"
+              --(positions,pngData) <- runGraphviz Neato name $ modelToDot model
+              let positions = ["TODO" :: String]
+              respondJSON ok200 $ JSON.object
+                 ["result"    .= False
+                 ,"text"      .= showAsHTML (annotate model term)
+                 ,"modelFile" .= name
+                 ,"modelPos"  .= positions
+                 ]
+  `catch` \e -> do
+    respondError internalServerError500 (show (e :: SomeException))
+  where
+  headers = 
+    [(hContentType,"application/json")]
+  respondJSON :: Status -> JSON.Value -> IO ResponseReceived
+  respondJSON status json =
+    respond $ responseLBS status headers $ encode json
+  respondError :: Status -> String -> IO ResponseReceived
+  respondError status message =
+    respondJSON status $ JSON.object ["result" .= ("error" :: String), "text" .= message]
+

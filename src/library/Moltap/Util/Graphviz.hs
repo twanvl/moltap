@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 {-# OPTIONS_GHC -Wall -fno-warn-name-shadowing #-}
 --------------------------------------------------------------------------------
 -- |
@@ -25,7 +26,7 @@ import System.Process
 import System.FilePath
 
 import Moltap.Util.Util
-import Moltap.Util.SimpleJSON
+--import Data.Aeason (ToJSON,object,(.=))
 
 --------------------------------------------------------------------------------
 -- Node positions
@@ -46,9 +47,10 @@ parseNodePosition = p . words . map (\x -> if x==',' then ' ' else x)
 parseNodePositions :: String -> [NodePosition]
 parseNodePositions = map parseNodePosition . filter (not . null) . drop 1 . lines
 
+{-
 instance ToJSON NodePosition where
-    toJSON (NodeCircle n x y r) = toJSON ["node" =: n, "x" =: x, "y" =: y, "r" =: r]
-
+    toJSON (NodeCircle n x y r) = object ["node" .= n, "x" .= x, "y" .= y, "r" .= r]
+-}
 --------------------------------------------------------------------------------
 -- Graphviz invokation
 --------------------------------------------------------------------------------

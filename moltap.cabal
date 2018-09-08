@@ -1,5 +1,5 @@
 name:                  moltap
-version:               0.2.1
+version:               0.3.0.0
 cabal-version:         >= 1.8
 build-type:            Simple
 license:               GPL
@@ -57,7 +57,6 @@ Library
     exposed-modules:
         Moltap.Util.Util
         Moltap.Util.Graphviz
-        Moltap.Util.SimpleJSON
         Moltap.Util.TreeZipper
         Moltap.Base.Agents
         Moltap.Base.Syntax
@@ -79,8 +78,13 @@ Executable moltap-cgi
         Buildable:        False
     build-depends:
         base >= 4.5,
-        cgi >= 3,
-        utf8-string,
+        text,
+        bytestring,
+        base64-bytestring,
+        aeson,
+        wai >= 3.0,
+        wai-extra >= 3.0,
+        http-types,
         moltap
     main-is:            CGIMain.hs
     hs-source-dirs:     src/cgi
