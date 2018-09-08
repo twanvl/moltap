@@ -27,6 +27,8 @@ import Control.Monad
 import Control.Exception
 
 import qualified Data.Text as Text
+import qualified Data.Text.Encoding as Text
+import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as LBS
 import qualified Data.ByteString.Lazy.Char8 as L8
 import qualified Data.ByteString.Base64 as Base64
@@ -36,6 +38,7 @@ import Network.Wai
 import Network.Wai.Handler.CGI
 import Network.Wai.Middleware.Gzip
 import Network.Wai.Middleware.Jsonp
+import Network.Wai.Parse
 import Network.HTTP.Types.Header
 import Network.HTTP.Types.Status
 import Network.HTTP.Types.URI
@@ -51,6 +54,20 @@ timelimit :: Int
 timelimit = 10000000 -- 10 seconds
 
 --------------------------------------------------------------------------------
+-- CGI utilities
+--------------------------------------------------------------------------------
+
+getParameters :: Request -> IO [(B.ByteString,B.ByteString)]
+getParameters req = do
+  let parseOpts = setMaxRequestNumFiles 0 $ defaultParseRequestBodyOptions
+  (params,_) <- parseRequestBodyEx parseOpts lbsBackEnd req
+  let query = queryString req
+  return $ params ++ [(x,y) | (x,Just y) <- query]
+
+decodeUtf8 :: B.ByteString -> String
+decodeUtf8 = Text.unpack . Text.decodeUtf8
+
+--------------------------------------------------------------------------------
 -- CGI main program
 --------------------------------------------------------------------------------
 
@@ -62,10 +79,10 @@ middleware = gzip def . jsonp
 
 app :: Application
 app req respond = do
-    let args = queryToQueryText (queryString req)
-    case join $ lookup "term" args of
+    args <- getParameters req
+    case lookup "term" args of
       Nothing -> respondError badRequest400 "Missing parameter 'term'"
-      Just termString -> case tryParse (Text.unpack termString) of
+      Just termString -> case tryParse (decodeUtf8 termString) of
         Left e     -> respondError badRequest400 $ showAsHTML e
         Right term -> timeoutWith timelimit (respondError serviceUnavailable503 "Time limit exceeded") $ do
           result <- evaluate (prove term)
