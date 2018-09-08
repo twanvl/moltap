@@ -84,7 +84,7 @@ Executable moltap-cgi
         moltap
     main-is:            CGIMain.hs
     hs-source-dirs:     src/Moltap/CGI
-    ghc-options:        -Wall
+    ghc-options:        -Wall -optl-static -optl-pthread
     extensions:         CPP
 
 Executable moltap
