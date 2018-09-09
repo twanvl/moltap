@@ -62,6 +62,9 @@ h1 .shadow {
 	right:			.5em;
 	bottom:			0px;
 }
+#header a {
+	color: white;
+}
 
 /* ================================================================== Navigation */
 
