@@ -127,30 +127,6 @@ function showInput(more, slide) {
 	}
 }
 
-// --------------------------------------------------------------------- : Version check
-
-function checkVersion() {
-	$.ajax({
-		url:"version.js",
-		dataType:"script",
-		success: function(){
-			var local = version;
-			$.ajax({
-				url:"http://twan.home.fmf.nl/moltap/version.js",
-				dataType:"script",
-				success: function(){
-					if (local < version) {
-						// we have an old version
-						$("#nav").append("<h3>Version</h3><p>This version of MOLTAP appears to be out of date. You are looking at version "+local+", while the <a href='http://twan.home.fmf.nl/moltap/'>latest version</a> is "+version+".</p>");
-					}
-				}});
-		}});
-}
-$(document).ready(checkVersion);
-if ($.browser.msie) $(document).ready(function(){
-	$("#nav").append("<h3>Internet Explorer</h3><p>Some features are not supported in Internet Explorer. Using another browser is recommended</p>");
-});
-
 // --------------------------------------------------------------------- : Fancy styling
 
 $("h1").ready(function(){
