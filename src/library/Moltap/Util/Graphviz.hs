@@ -29,8 +29,6 @@ import qualified Data.ByteString.Char8 as B
 import Data.Aeson (ToJSON(..),object,(.=))
 import Data.Char
 
-import Moltap.Util.Util
-
 --------------------------------------------------------------------------------
 -- Node positions
 --------------------------------------------------------------------------------
@@ -79,7 +77,6 @@ runGraphviz prog filename graphDot = do
     let positions = parseNodePositions out
     _ <- evaluate (length positions) -- force
     _ <- waitForProcess proc
-    makeFileReadable filename
     return positions
 
 -- | Run 'dot' or 'neato' to convert a .dot file to .png

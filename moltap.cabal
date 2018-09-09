@@ -50,9 +50,6 @@ Library
         parsec,
         filepath,
         hashable
-    If !os(windows)
-        build-depends:      unix
-        ghc-options:        -DUNIX
     hs-source-dirs:     src/library
     ghc-options:        -Wall
     extensions:         CPP

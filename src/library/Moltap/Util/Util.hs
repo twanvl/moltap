@@ -26,11 +26,6 @@ import Control.Exception
 import Control.Monad.Trans (MonadIO(..))
 import Control.Concurrent
 
-#ifdef UNIX
-import Data.Bits
-import System.Posix.Files
-#endif
-
 --------------------------------------------------------------------------------
 -- * Sorted lists
 --------------------------------------------------------------------------------
@@ -149,16 +144,6 @@ toFileName xs = case splitAt 30 xs of
     mkSafe 'z'  = "zz"
     mkSafe x | isAlphaNum x = [x]
     mkSafe _    = "z_"
-
--- | Make a file readable to all users
-makeFileReadable :: FilePath -> IO ()
-#ifdef UNIX
-makeFileReadable f = setFileMode f mode
-  where mode = ownerReadMode  .|. ownerWriteMode .|.
-               groupReadMode  .|. otherReadMode
-#else
-makeFileReadable _ = return ()
-#endif
 
 --------------------------------------------------------------------------------
 -- * IO Monad
