@@ -12,7 +12,7 @@ function answer(cls, text) {
 function run(input) {
 	answer("working","Working...");
 	$.ajax({
-		url: 'moltap.cgi',
+		url: 'cgi-bin/moltap-cgi',
 		type: 'post',
 		data: {term: input},
 		dataType: "json",
