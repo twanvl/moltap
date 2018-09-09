@@ -88,7 +88,7 @@ app req respond = do
                 ,"text"   .= showAsHTML term
                 ]
             Right model -> do
-               -- Render the model with graphviz
+              -- Render the model with graphviz
               (positions,pngData) <- runGraphvizToMemory Neato "png" $ modelToDot model
               let modelImage = encodeAsDataURI "image/png" pngData
               respondJSON ok200 $ JSON.object
