@@ -63,7 +63,8 @@ plusEdge (d,a) (e,b) = (d `plusDir` e, a `unionAgents` b)
 -- | Convert a model to a GraphViz graph
 modelToDot :: Model Int -> String
 modelToDot model
-    = concat [ "  " ++ show w ++ "[label=" ++ showVals (Map.toList vs)
+    = "digraph G {dpi=80;\n"
+   ++ concat [ "  " ++ show w ++ "[label=" ++ showVals (Map.toList vs)
                ++ ",shape=" ++ (if w == modRoot model then "doublecircle" else "circle")
                ++ ",URL=" ++ show w
                ++ "];\n"
@@ -79,6 +80,7 @@ modelToDot model
                      (_,    ExcludeAgents []) -> "*"
                      (_,    ExcludeAgents xs) -> "~" ++ concat (intersperse "," xs)
              ]
+   ++ "}"
   where showVals = escapeString . sep . map showVal
         sep []       = ""
         sep [a]      = a

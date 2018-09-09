@@ -19,9 +19,9 @@ function run(input) {
 		success: function(d) {
 			// successfull run, display result
 			var res = '';
-			if (d.modelFile) {
+			if (d.modelImage) {
 				res += "<div class='model'>";
-				res += "<img alt='counter model' src='" + d.modelFile + "'>";
+				res += "<img alt='counter model' src='" + d.modelImage + "'>";
 				for (i in d.modelPos) {
 					var p = d.modelPos[i];
 					p.r += i==0 ? 4 : 1;

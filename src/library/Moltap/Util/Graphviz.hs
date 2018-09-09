@@ -17,6 +17,7 @@ module Moltap.Util.Graphviz
     ( GraphvizProgram(..)
     , NodePosition(..)
     , runGraphviz, runGraphviz_
+    , runGraphvizToMemory
     ) where
 
 import Control.Monad
@@ -24,9 +25,11 @@ import Control.Exception
 import System.IO
 import System.Process
 import System.FilePath
+import qualified Data.ByteString.Char8 as B
+import Data.Aeson (ToJSON(..),object,(.=))
+import Data.Char
 
 import Moltap.Util.Util
---import Data.Aeason (ToJSON,object,(.=))
 
 --------------------------------------------------------------------------------
 -- Node positions
@@ -47,10 +50,9 @@ parseNodePosition = p . words . map (\x -> if x==',' then ' ' else x)
 parseNodePositions :: String -> [NodePosition]
 parseNodePositions = map parseNodePosition . filter (not . null) . drop 1 . lines
 
-{-
 instance ToJSON NodePosition where
     toJSON (NodeCircle n x y r) = object ["node" .= n, "x" .= x, "y" .= y, "r" .= r]
--}
+
 --------------------------------------------------------------------------------
 -- Graphviz invokation
 --------------------------------------------------------------------------------
@@ -67,11 +69,11 @@ instance Show GraphvizProgram where
 --
 --   Returns the positions of the nodes
 runGraphviz :: GraphvizProgram -> FilePath -> String -> IO [NodePosition]
-runGraphviz prog filename graph = do
+runGraphviz prog filename graphDot = do
     (i,o,_e,proc) <- runInteractiveProcess (show prog)
                       [extToType filename, "-Timap", "-o", filename] Nothing Nothing
     hSetEncoding i utf8
-    hPutStr i ("digraph G{dpi=80;\n" ++ graph ++ "\n}")
+    hPutStr i graphDot
     hClose  i
     out <- hGetContents o
     let positions = parseNodePositions out
@@ -79,6 +81,22 @@ runGraphviz prog filename graph = do
     _ <- waitForProcess proc
     makeFileReadable filename
     return positions
+
+-- | Run 'dot' or 'neato' to convert a .dot file to .png
+--
+--   Returns the positions of the nodes, and the image file contents
+runGraphvizToMemory :: GraphvizProgram -> String -> String -> IO ([NodePosition],B.ByteString)
+runGraphvizToMemory prog format dot =
+  let theProc = ((proc (show prog) ["-Timap","-T"++format]) { std_in = CreatePipe, std_out = CreatePipe })
+  in withCreateProcess theProc $ \(Just i) (Just o) _ proc -> do
+  hSetEncoding i utf8
+  hPutStr i dot
+  hClose i
+  hSetBinaryMode o True
+  out <- B.hGetContents o
+  _ <- waitForProcess proc
+  let (posData,imageData) = splitGraphvizOutput out
+  return (parseNodePositions $ B.unpack posData, imageData)
 
 runGraphviz_ :: GraphvizProgram -> FilePath -> String -> IO ()
 runGraphviz_ prog filename graph = void (runGraphviz prog filename graph)
@@ -88,3 +106,9 @@ extToType :: FilePath -> String
 extToType filename = case takeExtension filename of
     ""      -> "-Tpng"
     (_:ext) -> "-T" ++ ext
+
+-- | Split the output: positions first, then the remainder (png or svg)
+splitGraphvizOutput :: B.ByteString -> (B.ByteString,B.ByteString)
+splitGraphvizOutput = 
+  B.span (\x -> isSpace x || isPrint x && x `notElem` ['<','>'])
+

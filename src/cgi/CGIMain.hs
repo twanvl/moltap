@@ -23,14 +23,12 @@ import Moltap.Prover.Prover
 import Moltap.Util.Graphviz
 import Moltap.Util.Util
 
-import Control.Monad
 import Control.Exception
+import Data.Monoid
 
 import qualified Data.Text as Text
 import qualified Data.Text.Encoding as Text
 import qualified Data.ByteString as B
-import qualified Data.ByteString.Lazy as LBS
-import qualified Data.ByteString.Lazy.Char8 as L8
 import qualified Data.ByteString.Base64 as Base64
 
 import Data.Aeson as JSON hiding (json)
@@ -41,14 +39,10 @@ import Network.Wai.Middleware.Jsonp
 import Network.Wai.Parse
 import Network.HTTP.Types.Header
 import Network.HTTP.Types.Status
-import Network.HTTP.Types.URI
 
 --------------------------------------------------------------------------------
 -- Configuration
 --------------------------------------------------------------------------------
-
-modelImageDir :: FilePath
-modelImageDir = "model/"
 
 timelimit :: Int
 timelimit = 10000000 -- 10 seconds
@@ -95,24 +89,27 @@ app req respond = do
                 ]
             Right model -> do
                -- Render the model with graphviz
-              let name = modelImageDir ++ toFileName (show term) ++ ".png"
-              --(positions,pngData) <- runGraphviz Neato name $ modelToDot model
-              let positions = ["TODO" :: String]
+              (positions,pngData) <- runGraphvizToMemory Neato "png" $ modelToDot model
+              let modelImage = encodeAsDataURI "image/png" pngData
               respondJSON ok200 $ JSON.object
-                 ["result"    .= False
-                 ,"text"      .= showAsHTML (annotate model term)
-                 ,"modelFile" .= name
-                 ,"modelPos"  .= positions
+                 ["result"     .= False
+                 ,"text"       .= showAsHTML (annotate model term)
+                 ,"modelDot"   .= modelToDot model
+                 ,"modelImage" .= modelImage
+                 ,"modelPos"   .= positions
                  ]
   `catch` \e -> do
     respondError internalServerError500 (show (e :: SomeException))
   where
-  headers = 
-    [(hContentType,"application/json")]
+  headers = [(hContentType,"application/json")]
   respondJSON :: Status -> JSON.Value -> IO ResponseReceived
-  respondJSON status json =
+  respondJSON _status json =
     respond $ responseLBS status headers $ encode json
+    where status = ok200 -- note: always respond with 200 OK if possible, to get the error message in the javascript code
   respondError :: Status -> String -> IO ResponseReceived
   respondError status message =
     respondJSON status $ JSON.object ["result" .= ("error" :: String), "text" .= message]
+
+encodeAsDataURI :: Text.Text -> B.ByteString -> Text.Text
+encodeAsDataURI mimeType content = "data:" <> mimeType <> ";base64," <> Text.decodeUtf8 (Base64.encode content)
 
